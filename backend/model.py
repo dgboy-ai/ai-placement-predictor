@@ -8,7 +8,6 @@ def generate_dataset(n=1500):
 
     np.random.seed(42)
     
-   
     attendance = np.random.uniform(50, 100, n)
     cgpa = np.random.uniform(5, 10, n)
     projects = np.random.randint(0, 6, n)
@@ -47,7 +46,6 @@ def generate_dataset(n=1500):
     df['placed'] = (final_score >= threshold).astype(int)
     
     return df
-
 
 def train_model():
     """Trains a Random Forest classifier on the generated dataset."""

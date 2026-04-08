@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sqlite3
@@ -10,11 +10,15 @@ try:
     from backend.model import train_model
     from backend.explanation import generate_explanation
     from backend.roadmap import generate_roadmap
+    from backend.insights import generate_insights
+    from backend.resume_analyzer import analyze_resume
 except ImportError:
     # Fallback in case main.py is executed directly within the same directory
     from model import train_model 
     from explanation import generate_explanation
     from roadmap import generate_roadmap
+    from insights import generate_insights
+    from resume_analyzer import analyze_resume
 
 # Global variables to store the loaded model, scaler, and features list
 model = None
@@ -109,17 +113,36 @@ async def predict(student: StudentInput):
         # Generating AI-driven integrations dynamically
         explanation_data = generate_explanation(input_data, model, feature_names, probability_value)
         roadmap_data = generate_roadmap(input_data, probability_value)
+        insights_data = generate_insights(input_data, probability_value)
+        
+        # Calculate confidence
+        confidence_value = probability_value if probability_value >= 50 else (100 - probability_value)
+        confidence_label = f"{round(confidence_value, 1)}%"
         
         # 5. Return JSON payload conforming identically to design schema
         return {
             "probability": round(probability_value, 2),
             "prediction": prediction_label,
             "risk": risk_label,
+            "confidence": confidence_label,
+            "insights": insights_data,
             "explanation": explanation_data,
             "roadmap": roadmap_data
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction processing failed: {str(e)}")
+
+@app.post("/analyze-resume")
+async def analyze_resume_endpoint(file: UploadFile = File(...)):
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+    
+    try:
+        content = await file.read()
+        result = analyze_resume(content)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to analyze resume: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
