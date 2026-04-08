@@ -15,17 +15,12 @@ def generate_dataset(n=1500):
     communication_score = np.random.uniform(3, 10, n)
     backlogs = np.random.randint(0, 6, n)
     
-    # Add realistic correlations based on requirements
-    # 1. cgpa positively influences skills_score
     raw_skills = cgpa + np.random.normal(0, 1.5, n)
-    # Clip skills back to the 3-10 range
     skills_score = np.clip(raw_skills, 3, 10)
     
-    # 2. cgpa positively influences internships
     raw_interns = (cgpa - 5) / 5 * 3 + np.random.normal(0, 1, n) 
     internships = np.clip(np.round(raw_interns), 0, 5).astype(int)
     
-    # DataFrame construction
     df = pd.DataFrame({
         'attendance': attendance,
         'cgpa': cgpa,
@@ -36,8 +31,6 @@ def generate_dataset(n=1500):
         'backlogs': backlogs
     })
     
-    # Calculate a composite score using the requested weighted logic
-    # Higher weights for cgpa, and a negative weight for backlogs
     score = (
         (df['cgpa'] / 10) * 0.35 + 
         (df['skills_score'] / 10) * 0.25 + 
@@ -47,12 +40,9 @@ def generate_dataset(n=1500):
         (df['backlogs'] / 5) * 0.25
     )
     
-    # Add randomness/noise to the final decision to simulate real-world variance
     noise = np.random.normal(0, 0.05, n)
     final_score = score + noise
     
-    # Convert score to a binary (0/1) for 'placed' based on the median to ensure balanced dataset
-    # Alternatively could use a fixed threshold
     threshold = np.median(final_score)
     df['placed'] = (final_score >= threshold).astype(int)
     
@@ -76,11 +66,9 @@ def train_model():
     X = df[feature_names]
     y = df['placed']
     
-    # Standardize features
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     
-    # Train the RandomForest model
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_scaled, y)
     
