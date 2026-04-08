@@ -15,6 +15,7 @@ export default function Navbar() {
         <div className="navbar-right">
           <Link to="/" className={path === '/' ? 'active nav-link' : 'nav-link'}>Home</Link>
           <Link to="/dashboard" className={path === '/dashboard' ? 'active nav-link' : 'nav-link'}>Dashboard</Link>
+          <Link to="/analyzer" className={path === '/analyzer' ? 'active nav-link' : 'nav-link'}>Analyzer</Link>
           <Link to="/about" className={path === '/about' ? 'active nav-link' : 'nav-link'}>About</Link>
         </div>
       </div>

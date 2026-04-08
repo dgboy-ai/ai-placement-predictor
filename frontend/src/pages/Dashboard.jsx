@@ -3,13 +3,13 @@ import axios from 'axios';
 
 export default function Dashboard() {
   const [formData, setFormData] = useState({
-    attendance: '',
-    cgpa: '',
-    internships: '',
-    projects: '',
-    skills_score: '',
-    communication_score: '',
-    backlogs: ''
+    attendance: 75,
+    cgpa: 7.5,
+    internships: 0,
+    projects: 1,
+    skills_score: 7.0,
+    communication_score: 7.5,
+    backlogs: 0
   });
   
   const [result, setResult] = useState(null);
@@ -56,37 +56,79 @@ export default function Dashboard() {
           <div className="card">
             <h2>Profile Details</h2>
             <form onSubmit={handleSubmit} className="input-form">
-              <div className="form-group mb-4">
-                <label>Attendance (%)</label>
-                <input type="number" name="attendance" value={formData.attendance} onChange={handleChange} required min="0" max="100" placeholder="e.g. 85" />
-              </div>
-              <div className="form-group mb-4">
-                <label>CGPA</label>
-                <input type="number" step="0.01" name="cgpa" value={formData.cgpa} onChange={handleChange} required min="0" max="10" placeholder="e.g. 8.5" />
-              </div>
-              <div className="grid-2-cols mb-4">
-                <div className="form-group">
-                  <label>Internships</label>
-                  <input type="number" name="internships" value={formData.internships} onChange={handleChange} required min="0" placeholder="e.g. 2" />
+              {/* --- SECTION: Academic Details --- */}
+              <div className="form-section">
+                <h3 className="section-title">Academic Details</h3>
+                
+                <div className="form-group mb-4">
+                  <div className="label-row">
+                    <label>CGPA</label>
+                    <span className="live-value">{formData.cgpa || 0}</span>
+                  </div>
+                  <input type="range" name="cgpa" value={formData.cgpa} onChange={handleChange} min="0" max="10" step="0.1" className="styled-slider" />
                 </div>
-                <div className="form-group">
-                  <label>Projects</label>
-                  <input type="number" name="projects" value={formData.projects} onChange={handleChange} required min="0" placeholder="e.g. 3" />
+
+                <div className="grid-2-cols mb-4">
+                  <div className="form-group">
+                    <div className="label-row">
+                      <label>Attendance (%)</label>
+                      <span className="live-value">{formData.attendance || 0}%</span>
+                    </div>
+                    <input type="range" name="attendance" value={formData.attendance} onChange={handleChange} min="0" max="100" className="styled-slider" />
+                  </div>
+                  <div className="form-group">
+                    <label>Backlogs</label>
+                    <select name="backlogs" value={formData.backlogs} onChange={handleChange} className="styled-select">
+                      <option value="0">0</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3+</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div className="grid-2-cols mb-4">
-                <div className="form-group">
-                  <label>Skills (0-10)</label>
-                  <input type="number" name="skills_score" step="0.1" value={formData.skills_score} onChange={handleChange} required min="0" max="10" placeholder="e.g. 8.0" />
+
+              {/* --- SECTION: Skills & Experience --- */}
+              <div className="form-section mb-5">
+                <h3 className="section-title">Skills &amp; Experience</h3>
+                
+                <div className="grid-2-cols mb-4">
+                  <div className="form-group">
+                    <div className="label-row">
+                      <label>Technical Skills Level</label>
+                      <span className="live-value">{formData.skills_score || 0}</span>
+                    </div>
+                    <input type="range" name="skills_score" value={formData.skills_score} onChange={handleChange} min="0" max="10" step="0.1" className="styled-slider" />
+                  </div>
+                  <div className="form-group">
+                    <div className="label-row">
+                      <label>Communication Skills</label>
+                      <span className="live-value">{formData.communication_score || 0}</span>
+                    </div>
+                    <input type="range" name="communication_score" value={formData.communication_score} onChange={handleChange} min="0" max="10" step="0.1" className="styled-slider" />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Communication (0-10)</label>
-                  <input type="number" name="communication_score" step="0.1" value={formData.communication_score} onChange={handleChange} required min="0" max="10" placeholder="e.g. 7.5" />
+
+                <div className="grid-2-cols">
+                  <div className="form-group">
+                    <label>Internships</label>
+                    <select name="internships" value={formData.internships} onChange={handleChange} className="styled-select">
+                      <option value="0">0</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3+</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Projects</label>
+                    <select name="projects" value={formData.projects} onChange={handleChange} className="styled-select">
+                      <option value="0">0</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3+</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div className="form-group mb-5">
-                <label>Backlogs</label>
-                <input type="number" name="backlogs" value={formData.backlogs} onChange={handleChange} required min="0" placeholder="e.g. 0" />
               </div>
               
               <button type="submit" className="submit-btn" disabled={loading}>
