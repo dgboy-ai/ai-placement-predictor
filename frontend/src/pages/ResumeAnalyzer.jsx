@@ -99,6 +99,17 @@ export default function ResumeAnalyzer() {
           
           {result && (
             <div className="results-section fade-in">
+              <div className="card overview-card mb-4" style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '1.5rem' }}>
+                <div className="probability-wrapper">
+                  <div className={`probability-circle ${result.resume_score >= 80 ? 'risk-low' : result.resume_score >= 50 ? 'risk-medium' : 'risk-high'}`}></div>
+                  <div className="probability-value">{result.resume_score}<span>/100</span></div>
+                </div>
+                <div className="overview-details">
+                  <h3 className="prediction-status">ATS Resume Score</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', marginTop: '0.5rem' }}>Based on skills, projects, experience, and structural quality.</p>
+                </div>
+              </div>
+
               <div className="details-stack">
                 <div className="card">
                   <h3>Detected Skills</h3>
@@ -122,15 +133,28 @@ export default function ResumeAnalyzer() {
                   ) : <p className="mt-2 text-success" style={{ color: '#4ade80' }}>All required skills were detected!</p>}
                 </div>
                 
-                <div className="card insights-card">
-                  <h3>Resume Strengths</h3>
-                  <ul className="bullet-list" style={{ marginTop: '1rem' }}>
-                    {result.strength.map((st, idx) => (
-                      <li key={idx}>{st}</li>
-                    ))}
-                  </ul>
-                </div>
+                {result.strengths && result.strengths.length > 0 && (
+                  <div className="card insights-card">
+                    <h3>Resume Strengths</h3>
+                    <ul className="bullet-list" style={{ marginTop: '1rem' }}>
+                      {result.strengths.map((st, idx) => (
+                        <li key={idx}>{st}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 
+                {result.issues && result.issues.length > 0 && (
+                  <div className="card" style={{ borderLeft: '4px solid #ef4444' }}>
+                    <h3 style={{ color: '#ef4444' }}>Critical Issues</h3>
+                    <ul className="bullet-list" style={{ marginTop: '1rem' }}>
+                      {result.issues.map((iss, idx) => (
+                        <li key={idx}>{iss}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="card explanation-card">
                   <h3>Actionable Suggestions</h3>
                   <ul className="bullet-list" style={{ marginTop: '1rem' }}>

@@ -24,6 +24,11 @@ export default function About() {
             <h3>Personalized Roadmap</h3>
             <p>Receive a highly structured, 6-month actionable plan with monthly focus tasks, KPIs, and checkpoints.</p>
           </div>
+          <div className="feature-card">
+            <div className="feature-icon">📄</div>
+            <h3>Resume Intelligence Engine</h3>
+            <p>Upload your PDF resume to receive an ATS score, deep skill-gap analysis, and actionable formatting suggestions.</p>
+          </div>
         </div>
       </div>
     </div>
