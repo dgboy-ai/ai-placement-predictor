@@ -189,48 +189,86 @@ export default function ResumeAnalyzer() {
 
           {result && (
             <div className="results-wrapper fade-in" style={{display: 'flex', flexDirection: 'column', gap: '2.5rem'}}>
-               <div className="card overview-card mt-0 frosted-card" style={{borderLeft: '10px solid var(--primary)', padding: '3rem', display: 'flex', alignItems: 'center', gap: '3rem'}}>
-                 <div style={{
-                    width: '140px', height: '140px', borderRadius: '50%', 
-                    border: '8px solid rgba(255,255,255,0.05)', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                    background: 'rgba(56, 189, 248, 0.05)',
-                    boxShadow: '0 0 30px rgba(56, 189, 248, 0.1)'
-                 }}>
-                    <div style={{fontSize: '3.5rem', fontWeight: '900', color: 'var(--primary)'}}>{result.resume_score}<span style={{fontSize: '1rem', verticalAlign: 'middle'}}>%</span></div>
-                 </div>
-                  <div style={{flex: 1}}>
-                     <span style={{fontSize: '0.85rem', color: 'var(--primary)', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px'}}>Readiness Score</span>
-                     <h3 style={{fontSize: '3rem', marginTop: '0.5rem', fontFamily: 'var(--font-heading)'}}>{result.ats_status}</h3>
-                     <div className="badges mt-3" style={{display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap'}}>
-                       <span className="badge" style={{background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.2)'}}>
-                         Target: {result.job_field}
-                       </span>
+               <div className="top-dashboard-section" style={{display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)', gap: '1.5rem', alignItems: 'stretch'}}>
+                 <div className="card overview-card mt-0 frosted-card" style={{borderLeft: '10px solid var(--primary)', padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+                   <div style={{display: 'flex', alignItems: 'center', gap: '2rem'}}>
+                     <div style={{
+                        width: '120px', height: '120px', borderRadius: '50%', 
+                        border: '6px solid rgba(255,255,255,0.05)', 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                        background: 'rgba(56, 189, 248, 0.05)',
+                        boxShadow: '0 0 30px rgba(56, 189, 248, 0.1)'
+                     }}>
+                        <div style={{fontSize: '3rem', fontWeight: '900', color: 'var(--primary)'}}>{result.resume_score}<span style={{fontSize: '1rem', verticalAlign: 'middle'}}>%</span></div>
+                     </div>
+                      <div style={{flex: 1}}>
+                         <span style={{fontSize: '0.85rem', color: 'var(--primary)', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px'}}>Readiness Score</span>
+                         <h3 style={{fontSize: '2.5rem', marginTop: '0.2rem', fontFamily: 'var(--font-heading)'}}>{result.ats_status}</h3>
+                         <div className="badges mt-3" style={{display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap'}}>
+                           <span className="badge" style={{background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.2)'}}>
+                             Target: {result.job_field}
+                           </span>
+                         </div>
+                      </div>
+                   </div>
+                   
+                   <div style={{marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)'}}>
                        <button 
                          onClick={handleDownloadImproved} 
                          disabled={improving}
-                         className="btn-link"
+                         className="submit-btn"
                          style={{
+                           width: '100%',
                            background: 'var(--primary)',
                            color: 'white',
-                           border: 'none',
-                           padding: '0.6rem 1.2rem',
-                           borderRadius: '8px',
-                           fontSize: '0.85rem',
+                           padding: '1rem',
+                           borderRadius: '10px',
+                           fontSize: '1rem',
                            fontWeight: '700',
                            cursor: 'pointer',
                            display: 'flex',
                            gap: '0.5rem',
+                           justifyContent: 'center',
                            alignItems: 'center',
-                           marginLeft: 'auto',
                            boxShadow: '0 4px 15px rgba(var(--primary-rgb), 0.3)'
                          }}
                        >
-                         {improving ? <><span className="spinner" style={{width: '14px', height: '14px'}}></span> Improving...</> : <>✨ Download Improved Resume (ATS Focus)</>}
+                         {improving ? <><span className="spinner" style={{width: '16px', height: '16px'}}></span> Improving...</> : <>✨ Download Improved Resume (ATS Focus)</>}
                        </button>
-                     </div>
-                  </div>
+                   </div>
+                 </div>
+
+                 {/* VISUAL CHART SECTION MOVED TO TOP */}
+                 <div className="card frosted-card" style={{padding: '2rem', margin: 0, display: 'flex', flexDirection: 'column'}}>
+                   <h3 style={{fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'var(--font-heading)'}}>Impact Analytics 📊</h3>
+                   <div style={{width: '100%', flex: 1, minHeight: '220px'}}>
+                     <ResponsiveContainer width="100%" height="100%">
+                       <BarChart data={[
+                         { metric: 'Overall Match', score: result.field_match_index || 0, fill: '#10b981' },
+                         { metric: 'Action Verbs', score: Math.min((result.impact_telemetry?.action_velocity || 0) * 10, 100), fill: '#38bdf8' },
+                         { metric: 'Metrics Density', score: Math.min((result.impact_telemetry?.metric_density || 0) * 20, 100), fill: '#0ea5e9' },
+                         { metric: 'ATS Readiness', score: result.resume_score || 0, fill: '#8b5cf6' }
+                       ]} margin={{top: 10, right: 10, bottom: 20, left: -20}}>
+                         <XAxis dataKey="metric" tick={{fill: '#94a3b8', fontSize: 11}} interval={0} />
+                         <YAxis domain={[0, 100]} tick={{fill: '#94a3b8', fontSize: 12}} />
+                         <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', zIndex: 100}} />
+                         <Bar dataKey="score" radius={[6, 6, 0, 0]}>
+                           {
+                             [
+                               { metric: 'Overall Match', score: result.field_match_index || 0, fill: '#10b981' },
+                               { metric: 'Action Verbs', score: Math.min((result.impact_telemetry?.action_velocity || 0) * 10, 100), fill: '#38bdf8' },
+                               { metric: 'Metrics Density', score: Math.min((result.impact_telemetry?.metric_density || 0) * 20, 100), fill: '#0ea5e9' },
+                               { metric: 'ATS Readiness', score: result.resume_score || 0, fill: '#8b5cf6' }
+                             ].map((entry, index) => (
+                               <Cell key={`cell-${index}`} fill={entry.fill} />
+                             ))
+                           }
+                         </Bar>
+                       </BarChart>
+                     </ResponsiveContainer>
+                   </div>
+                 </div>
                </div>
 
                <div className="features-grid" style={{gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem'}}>
@@ -264,36 +302,7 @@ export default function ResumeAnalyzer() {
                   </div>
                </div>
 
-                {/* VISUAL CHART SECTION */}
-                <div className="card frosted-card" style={{padding: '2rem'}}>
-                  <h3 style={{fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'var(--font-heading)'}}>Impact Analytics 📊</h3>
-                  <div style={{width: '100%', height: '280px'}}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={[
-                        { metric: 'Overall Match', score: result.field_match_index, fill: '#10b981' },
-                        { metric: 'Action Verbs', score: Math.min((result.impact_telemetry?.action_velocity || 0) * 10, 100), fill: '#38bdf8' },
-                        { metric: 'Metrics Density', score: Math.min((result.impact_telemetry?.metric_density || 0) * 20, 100), fill: '#0ea5e9' },
-                        { metric: 'ATS Readiness', score: result.resume_score, fill: '#8b5cf6' }
-                      ]} margin={{top: 10, right: 10, bottom: 20, left: -20}}>
-                        <XAxis dataKey="metric" tick={{fill: '#94a3b8', fontSize: 12}} />
-                        <YAxis domain={[0, 100]} tick={{fill: '#94a3b8', fontSize: 12}} />
-                        <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px'}} />
-                        <Bar dataKey="score" radius={[6, 6, 0, 0]}>
-                          {
-                            [
-                              { metric: 'Overall Match', score: result.field_match_index, fill: '#10b981' },
-                              { metric: 'Action Verbs', score: Math.min((result.impact_telemetry?.action_velocity || 0) * 10, 100), fill: '#38bdf8' },
-                              { metric: 'Metrics Density', score: Math.min((result.impact_telemetry?.metric_density || 0) * 20, 100), fill: '#0ea5e9' },
-                              { metric: 'ATS Readiness', score: result.resume_score, fill: '#8b5cf6' }
-                            ].map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.fill} />
-                            ))
-                          }
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
+
 
                <div className="card frosted-card" style={{padding: '3rem', background: 'rgba(15, 23, 42, 0.4)'}}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem'}}>

@@ -1,4 +1,4 @@
-# 🌌 Nextora AI: The Future of Career Intelligence
+#  Nextora AI: The Future of Career Intelligence
 
 **Unlock Your Career Potential with Data-Driven Insights & Artificial Intelligence.**
 
@@ -6,35 +6,35 @@ Nextora AI is a comprehensive, student-centric career acceleration platform desi
 
 ---
 
-## 🚀 Mission & Vision
+##  Mission & Vision
 Nextora AI exists to solve the "Preparation Gap" faced by millions of college students worldwide. By providing a secure, high-fidelity environment for skill verification and placement analytics, we empower the next generation of professionals to walk into interviews with data-backed confidence.
 
 ---
 
-## 🛠️ Intelligent Services Suite
+##  Intelligent Services Suite
 
-### 1. 📊 Placement Predictor Engine
+### 1.  Placement Predictor Engine
 Our flagship service utilizes a sophisticated multi-layer analytical model to forecast placement outcomes.
 - **Deep Academic Analysis**: Evaluates CGPA and attendance patterns against alumni success data.
 - **Skillset Equilibrium**: Factors in communication and technical scores to provide a holistic readiness percentage.
 - **Strategic Roadmap**: Generates a dynamic, 6-month preparation plan specifically tailored to fix the "leaks" in your profile.
 - **Risk Mitigation**: Identifies specific "red flags" (like backlogs or low project counts) and suggests immediate recovery steps.
 
-### 2. 📄 Resume Intelligence (High-Fidelity)
+### 2. Resume Intelligence (High-Fidelity)
 Moving beyond basic keyword matching, our Resume Analyzer provides deterministic career alignment.
 - **Contextual Parsing**: Extracts projects, internships, and technical keywords with precision.
 - **Role Alignment Score**: Automatically compares your experience against industry standards for roles like *Data Scientist*, *Frontend Engineer*, or *Cybersecurity Analyst*.
 - **Strengths & Growth Areas**: Provides a visual breakdown of what you've mastered and where your profile is lacking.
 - **Direct Feedback**: Honest, actionable tips on how to rephrase or highlight your achievements to catch a recruiter's eye.
 
-### 3. 🛡️ GitHub Portfolio Verification
+### 3. GitHub Portfolio Verification
 Transform your code into an authentic professional asset.
 - **Commit Velocity Tracking**: Analyzes your consistency and dedication through GitHub activity.
 - **Stack Distribution**: Automatically detects and verifies your primary programming languages and framework expertise.
 - **Project Authenticity**: Ensures your portfolio reflects real, active work rather than static forks.
 - **Recruiter Confidence**: Build a profile that recruiters can trust with verified GitHub metrics.
 
-### 4. 👤 Student Persona System
+### 4. Student Persona System
 A unified dashboard to manage your professional identity.
 - **Live Profile Editing**: Update your academic identity, university, and contact details in real-time.
 - **Engagement Analytics**: Track every prediction and analysis step you take on the platform.
@@ -42,7 +42,7 @@ A unified dashboard to manage your professional identity.
 
 ---
 
-## 🎨 Design Philosophy: Modern & Human
+## Design Philosophy: Modern & Human
 Nextora AI is built on the **Glassmorphism Design System**, ensuring a premium, futuristic aesthetic that doesn't sacrifice usability.
 - **Interactive Micro-animations**: Smooth transitions and hover effects for an engaging experience.
 - **Responsive Geometry**: Perfectly optimized for everything from massive desktop monitors to mobile devices.
@@ -50,7 +50,7 @@ Nextora AI is built on the **Glassmorphism Design System**, ensuring a premium, 
 
 ---
 
-## 🏗️ Technical Architecture
+## Technical Architecture
 
 ### **Frontend Tier: The Visual Engine**
 - **React 18 & Vite**: For lightning-fast Hot Module Replacement (HMR) and optimized build times.
@@ -64,7 +64,7 @@ Nextora AI is built on the **Glassmorphism Design System**, ensuring a premium, 
 
 ---
 
-## 📂 Project Structure Map
+## Project Structure Map
 ```text
 Solox/
 ├── main.py                 # FastAPI Gateway & API Endpoints
@@ -84,7 +84,7 @@ Solox/
 
 ---
 
-## 🚀 Deployment & Installation
+## Deployment & Installation
 
 ### 1. Intelligence Engine (Backend)
 ```bash
