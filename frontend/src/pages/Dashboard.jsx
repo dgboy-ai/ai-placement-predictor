@@ -161,8 +161,8 @@ export default function Dashboard() {
           )}
           
           {result && (
-            <div className="results-section fade-in">
-              <div className="card overview-card">
+            <div className="results-section">
+              <div className="card overview-card pop-in">
                 <div className="probability-wrapper">
                   <div className={`probability-circle ${getRiskColor(result.risk)}`}></div>
                   <div className="probability-value">{Math.round(result.probability)}<span>%</span></div>
@@ -210,7 +210,7 @@ export default function Dashboard() {
           <h3>Your 6-Month Roadmap</h3>
           <div className="roadmap-stack">
             {result.roadmap.map((rm, idx) => (
-              <div className="card roadmap-card" key={idx}>
+              <div className="card roadmap-card pop-in" style={{animationDelay: `${idx * 0.15}s`}} key={idx}>
                 <div className="rm-header">
                   <span className="rm-month">{rm.month}</span>
                   <h4 className="rm-focus">{rm.focus}</h4>
