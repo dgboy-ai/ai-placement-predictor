@@ -24,7 +24,7 @@ def get_total_commits(username: str, headers: dict) -> int:
         pass
     return 0
 
-def analyze_github_profile(input_text: str) -> dict:
+def analyze_github_profile(input_text: str, job_field: str = "General Software Engineering") -> dict:
     username = parse_github_username(input_text)
     if not username: return {"error": "Invalid GitHub link format."}
 
@@ -50,8 +50,7 @@ def analyze_github_profile(input_text: str) -> dict:
         born_date = datetime.strptime(user_data.get("created_at", "2020-01-01T00:00:00Z"), "%Y-%m-%dT%H:%M:%SZ")
         account_age_days = max(1, (datetime.now() - born_date).days)
         
-        # Unique Logic: Coding Velocity
-        velocity = (total_commits / (account_age_days / 30)) # commits per month average
+        velocity = (total_commits / (account_age_days / 30))
         
         original_repos = []
         fork_repos = []
@@ -73,58 +72,73 @@ def analyze_github_profile(input_text: str) -> dict:
             if updated_at and datetime.strptime(updated_at, "%Y-%m-%dT%H:%M:%SZ") > six_months_ago:
                 activity_index += 1
 
-        # 4. Integrity Heuristics
+        # 4. Field-Specific Project Mapping
+        field_projects = {
+            "Full Stack Development": ["E-commerce App", "SAAS Dashboard", "Real-time Chat", "Auth System"],
+            "Data Science & AI": ["Predictive Model", "Data Scraper", "Neural Network Implementation", "Sentiment Analyzer"],
+            "DevOps & Cloud": ["CI/CD Pipeline", "K8s Cluster Setup", "Infrastructure as Code", "Monitoring Tool"],
+            "Backend Engineering": ["Distributed Caching", "REST API Framework", "Database Migrator", "Job Queue"],
+            "Frontend Engineering": ["UI Component Library", "Animation Suite", "Portfolio Theme", "PWA Application"]
+        }
+        
+        recommended_projects = field_projects.get(job_field, ["Open Source Contribution", "Personal Portfolio"])
+
+        # 5. Integrity & Field Alignment
         authenticity_flags = []
         fork_ratio = len(fork_repos) / (public_repos if public_repos > 0 else 1)
         
-        if fork_ratio > 0.85 and total_commits < 50:
-            authenticity_flags.append("Warning: Heavily derivative profile content with minimal authorship.")
-        if velocity < 0.5 and account_age_days > 365:
-            authenticity_flags.append("Dormancy Alert: Profile demonstrates negligible long-term coding velocity.")
-
-        # 5. Winning Scoring Logic (Surgical)
+        if fork_ratio > 0.85:
+            authenticity_flags.append("High Fork Ratio: Large volume of work is inherited, reducing originality proof.")
+        
+        # 6. Scoring Logic
         raw_score = 0
-        raw_score += min(30, (total_commits / 100) * 30) # Volume
-        raw_score += min(30, (len(original_repos) / 5) * 30) # Ownership
-        raw_score += min(20, (activity_index / 3) * 20) # Momentum
-        raw_score += min(10, (total_stars * 1 + followers * 0.5)) # Validation
-        raw_score += min(10, (len(languages_count) * 2.5)) # Diversity
+        raw_score += min(30, (total_commits / 100) * 30)
+        raw_score += min(30, (len(original_repos) / 5) * 30)
+        raw_score += min(20, (activity_index / 3) * 20)
+        raw_score += min(20, (total_stars * 1 + len(languages_count) * 2))
         
-        # 6. Deep Insights (Tone Shift)
+        # 7. Field-Specific Insights
         strengths = []
-        if velocity > 10: strengths.append(f"High-Velocity Coder: Averaging {round(velocity, 1)} commits/month.")
-        if total_stars > 5: strengths.append("Community Signal: Original work has validated external utility.")
-        if len(languages_count) >= 3: strengths.append("Full-Stack Adaptability: Demonstrated cross-domain technical depth.")
+        if velocity > 15: strengths.append(f"Field Agility: High coding velocity indicates rapid adaptation to {job_field} tools.")
+        if len(languages_count) >= 3: strengths.append(f"Domain Versatility: Multi-language profile supports cross-functional {job_field} tasks.")
         
-        weaknesses = []
-        if total_commits < 30: weaknesses.append("Evidence Gap: Insufficient commit volume to validate skill claims.")
-        if activity_index < 1: weaknesses.append("Low Momentum: Limited Proof of Work in current technical cycle.")
+        weak_points = []
+        if len(original_repos) < 2: weak_points.append(f"Portfolio Thinness: Minimal original software for {job_field} validation.")
+        if activity_index < 1: weak_points.append("Stagnant Profile: No active development in current tech cycle.")
 
-        # 7. Professional Persona
-        if raw_score > 85: persona = "Technical Lead"
-        elif total_stars > 15: persona = "Innovator"
-        elif velocity > 20: persona = "Power Contributor"
-        elif len(original_repos) >= 3: persona = "Product Builder"
-        else: persona = "Technical Explorer"
+        improvements = []
+        for proj in recommended_projects:
+            found = False
+            for repo in original_repos:
+                if proj.lower() in repo.get("name", "").lower() or proj.lower() in (repo.get("description") or "").lower():
+                    found = True
+                    break
+            if not found:
+                improvements.append(f"BUILD: A '{proj}' to strengthen your {job_field} portfolio.")
 
         return {
             "username": username,
-            "verification_status": "Verified Elite" if raw_score > 80 else ("Stable Profile" if raw_score > 40 else "Provisional Profile"),
+            "job_field": job_field,
             "github_score": round(raw_score, 1),
-            "persona": persona,
             "velocity": round(velocity, 2),
+            "persona": f"{job_field} Specialist" if raw_score > 70 else "Technical Explorer",
             "stats": {
                 "commits": total_commits,
                 "originals": len(original_repos),
-                "stars": total_stars,
-                "velocity_per_month": round(velocity, 1)
+                "stars": total_stars
             },
             "technical_stack": sorted(languages_count.items(), key=lambda x: x[1], reverse=True)[:5],
-            "strengths": strengths if strengths else ["Profile ready for review."],
-            "weaknesses": weaknesses if weaknesses else ["High integrity profile."],
+            "strengths": strengths if strengths else ["Profile ready for industry benchmark."],
+            "weak_points": weak_points if weak_points else ["No major project gaps detected."],
+            "recommended_projects": recommended_projects,
+            "improvements": improvements[:3] if improvements else ["Contribute to notable open-source repositories."],
             "is_authentic": len(authenticity_flags) == 0,
-            "screening_insights": authenticity_flags if authenticity_flags else ["Operational markers indicate valid professional intent."]
+            "screening_insights": authenticity_flags if authenticity_flags else ["Profile metadata suggests authentic professional growth."]
         }
+
+    except Exception as e:
+        return {"error": f"Deep analysis failure: {str(e)}"}
+
 
     except Exception as e:
         return {"error": f"Deep analysis failure: {str(e)}"}

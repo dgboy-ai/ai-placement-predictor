@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sqlite3
@@ -145,19 +145,20 @@ async def predict(student: StudentInput):
         raise HTTPException(status_code=500, detail=f"Prediction processing failed: {str(e)}")
 
 @app.post("/analyze-resume")
-async def analyze_resume_endpoint(file: UploadFile = File(...)):
+async def analyze_resume_endpoint(file: UploadFile = File(...), job_field: str = Form("General Software Engineering")):
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
     
     try:
         content = await file.read()
-        result = analyze_resume(content)
+        result = analyze_resume(content, job_field)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to analyze resume: {str(e)}")
 
 class GithubInput(BaseModel):
     github_link: str
+    job_field: str = "General Software Engineering"
 
 @app.post("/analyze-github")
 async def analyze_github_endpoint(input_data: GithubInput):
@@ -165,7 +166,7 @@ async def analyze_github_endpoint(input_data: GithubInput):
         raise HTTPException(status_code=400, detail="GitHub link is required.")
         
     try:
-        result = analyze_github_profile(input_data.github_link)
+        result = analyze_github_profile(input_data.github_link, input_data.job_field)
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
         return result
