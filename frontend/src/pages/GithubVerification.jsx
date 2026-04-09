@@ -50,7 +50,7 @@ export default function GithubVerification() {
         </div>
       </div>
 
-      <div className="dashboard-grid">
+      <div className="dashboard-grid mb-5">
         <section className="dashboard-form">
           <div className="card shadow-glass">
             <h2 style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem'}}>
@@ -76,7 +76,7 @@ export default function GithubVerification() {
                      value={jobField} 
                      onChange={(e) => setJobField(e.target.value)}
                      className="styled-input"
-                     style={{cursor: 'pointer'}}
+                     style={{cursor: 'pointer', background: 'rgba(255,255,255,0.03)'}}
                    >
                      {jobFields.map(field => (
                        <option key={field} value={field}>{field}</option>
@@ -84,23 +84,45 @@ export default function GithubVerification() {
                    </select>
                 </div>
 
-              <button type="submit" className="submit-btn" disabled={loading} style={{padding: '1.5rem'}}>
-                {loading ? <><span className="spinner"></span> De-forking Repos...</> : 'Execute Deep Screening'}
+              <button type="submit" className="submit-btn" disabled={loading} style={{padding: '1.2rem'}}>
+                {loading ? <><span className="spinner"></span> Executing Deep Scan...</> : 'Verify Developer Persona'}
               </button>
             </form>
             {error && <div className="error-message mt-4">{error}</div>}
 
             <div className="no-github-card mt-5 pt-4 border-top">
               <h4 className="mb-2" style={{color: 'white'}}>No Portfolio yet?</h4>
-              <p className="text-muted mb-4" style={{fontSize: '0.85rem'}}>GitHub serves as your living technical resume. Without it, verifying your skills becomes significantly harder.</p>
+              <p className="text-muted mb-4" style={{fontSize: '0.85rem'}}>GitHub is the "Proof of Work" standard. Without it, verifying your skills becomes significantly harder.</p>
               <a href="https://github.com/join" target="_blank" rel="noopener noreferrer" className="nav-link" style={{color: 'var(--accent)', padding: 0}}>Create Account Now →</a>
             </div>
           </div>
         </section>
 
-        <section className="dashboard-results">
+        <section className="industry-context" style={{display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
+          <div className="card pop-in" style={{borderLeft: '4px solid var(--accent)', background: 'rgba(129, 140, 248, 0.02)'}}>
+            <h3 style={{fontSize: '1rem', marginBottom: '0.5rem', color: 'var(--accent)'}}>🛠️ Proof of Work Era</h3>
+            <p style={{fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6'}}>
+              In modern tech hiring, "Show, Don't Tell" is the rule. A verified GitHub profile provides deterministic proof of your ability to ship production-grade code.
+            </p>
+          </div>
+          <div className="card pop-in" style={{borderLeft: '4px solid var(--accent-secondary)', animationDelay: '0.2s', background: 'rgba(168, 85, 247, 0.02)'}}>
+            <h3 style={{fontSize: '1rem', marginBottom: '0.5rem', color: 'var(--accent-secondary)'}}>⚡ Velocity over Squares</h3>
+            <p style={{fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6'}}>
+              Green squares can be faked; <i>Commit Velocity</i> cannot. We analyze your contribution frequency and code-churn across the last 6 months to measure true momentum.
+            </p>
+          </div>
+          <div className="card pop-in" style={{borderLeft: '4px solid var(--success)', animationDelay: '0.4s', background: 'rgba(16, 185, 129, 0.02)'}}>
+            <h3 style={{fontSize: '1rem', marginBottom: '0.5rem', color: 'var(--success)'}}>📂 Authorship Heuristics</h3>
+            <p style={{fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6'}}>
+              Anyone can fork a project. We de-fork repositories to find the <u>original work</u> you built from scratch, separating real builders from technical curators.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <div className="results-container">
           {loading && (
-             <div className="placeholder-result loading-result card" style={{height: '100%'}}>
+             <div className="placeholder-result loading-result card" style={{height: '300px'}}>
                <span className="spinner large-spinner" style={{borderTopColor: 'var(--accent-secondary)'}}></span>
                <h3>Syncing Global Commits...</h3>
                <p>Calculating velocity vectors for target profile...</p>
@@ -108,7 +130,7 @@ export default function GithubVerification() {
           )}
 
           {!result && !loading && (
-             <div className="placeholder-result card" style={{height: '100%', borderStyle: 'solid'}}>
+             <div className="placeholder-result card" style={{height: '300px', borderStyle: 'solid'}}>
                 <div className="placeholder-icon">🛡️</div>
                 <h3>Deterministic Verification</h3>
                 <p>Provide a GitHub link to verify coding activity and authorship heuristics.</p>
@@ -187,7 +209,6 @@ export default function GithubVerification() {
               </div>
             </div>
           )}
-        </section>
       </div>
     </div>
   );
