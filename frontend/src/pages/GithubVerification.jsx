@@ -90,7 +90,7 @@ export default function GithubVerification() {
         <section className="verification-results">
           {!result && !loading && (
             <div className="card placeholder-result" style={{height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-              <div className="placeholder-icon">🔍</div>
+              <div className="placeholder-icon">📊</div>
               <h3>Awaiting Analysis</h3>
               <p>Submit a profile to see deep metrics including commit history, fork analysis, and original work verification.</p>
             </div>
@@ -106,79 +106,107 @@ export default function GithubVerification() {
 
           {result && (
             <div className="results-stack fade-in">
-              <div className="card overview-card mb-4" style={{gap: '2rem'}}>
-                <div className="probability-wrapper" style={{width: '160px', height: '160px'}}>
-                  <div className={`probability-circle ${result.github_score > 70 ? 'risk-low' : result.github_score > 40 ? 'risk-medium' : 'risk-high'}`}></div>
-                  <div className="probability-value" style={{fontSize: '3.5rem'}}>{Math.round(result.github_score)}</div>
+              <div className="card overview-card mb-4" style={{gap: '3rem', position: 'relative'}}>
+                <div className="probability-wrapper" style={{width: '200px', height: '200px'}}>
+                  <div className={`probability-circle ${result.github_score > 75 ? 'risk-low' : result.github_score > 40 ? 'risk-medium' : 'risk-high'}`}></div>
+                  <div className="probability-value" style={{fontSize: '4rem'}}>{Math.round(result.github_score)}<span>%</span></div>
                 </div>
+                
                 <div className="overview-details">
+                  <div className="persona-badge" style={{background: 'var(--accent)', color: 'white', padding: '0.2rem 1rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '900', display: 'inline-block', marginBottom: '1rem', textTransform: 'uppercase'}}>
+                    Persona: {result.persona}
+                  </div>
                   <div className="verification-badge-large">
-                    <span style={{fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '800'}}>Verification Status</span>
-                    <h2 className={getVerificationColor(result.verification_status)} style={{fontSize: '2.5rem', margin: '0.5rem 0'}}>{result.verification_status}</h2>
+                    <span style={{fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '800'}}>Integrity Status</span>
+                    <h2 className={result.is_authentic ? 'text-success' : 'text-danger'} style={{fontSize: '2.5rem', margin: '0.5rem 0'}}>{result.verification_status}</h2>
                   </div>
                   <div className="badges">
-                    <span className="badge risk risk-low">{result.activity_level} Activity</span>
+                    <span className="badge risk risk-low">Coding Velocity: {result.velocity} / mo</span>
                     <span className={`badge ${result.is_authentic ? 'risk-low' : 'risk-high'}`}>
-                      {result.is_authentic ? 'Authentic Work' : 'Low Authenticity'}
+                      {result.is_authentic ? 'Verified Authentic' : 'Authenticity Risk'}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="grid-2-cols mb-4">
-                <div className="card stats-card" style={{flex: 1, padding: '1.5rem'}}>
-                  <h4 style={{color: 'var(--accent)', marginBottom: '1.5rem', textTransform: 'uppercase', fontSize: '0.9rem'}}>Developer Stats</h4>
-                  <div className="stats-list">
-                    <div className="stat-item">
-                      <span>Total Commits</span>
-                      <strong>{result.stats.total_commits}</strong>
-                    </div>
-                    <div className="stat-item">
-                      <span>Original Projects</span>
-                      <strong>{result.stats.original_projects}</strong>
-                    </div>
-                    <div className="stat-item">
-                      <span>Forked Projects</span>
-                      <strong>{result.stats.forked_projects}</strong>
-                    </div>
-                    <div className="stat-item">
-                      <span>Global Stars</span>
-                      <strong>{result.stats.total_stars}</strong>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="card tech-card" style={{flex: 1, padding: '1.5rem'}}>
-                  <h4 style={{color: 'var(--accent-secondary)', marginBottom: '1.5rem', textTransform: 'uppercase', fontSize: '0.9rem'}}>Top Technologies</h4>
-                  <div className="tech-stack-list">
-                    {result.technical_stack.map(([lang, count], idx) => (
-                      <div key={idx} className="tech-item">
-                        <span className="lang-name">{lang}</span>
-                        <div className="skill-bar-bg">
-                          <div 
-                            className="skill-bar-fill" 
-                            style={{width: `${Math.min(count * 20, 100)}%`, background: 'var(--accent-secondary)'}}
-                          ></div>
+                 <div className="details-stack" style={{gap: '1.5rem'}}>
+                    <div className="card stats-card" style={{padding: '2rem'}}>
+                      <h3 className="section-title">Telemetry</h3>
+                      <div className="stats-list" style={{marginTop: '1.5rem'}}>
+                        <div className="stat-item" style={{display: 'flex', justifyContent: 'space-between', padding: '0.8rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)'}}>
+                          <span className="text-muted">Total Commits</span>
+                          <strong style={{color: 'white'}}>{result.stats.commits}</strong>
                         </div>
-                        <span className="lang-count">{count}</span>
+                        <div className="stat-item" style={{display: 'flex', justifyContent: 'space-between', padding: '0.8rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)'}}>
+                          <span className="text-muted">Original Repos</span>
+                          <strong style={{color: 'white'}}>{result.stats.originals}</strong>
+                        </div>
+                        <div className="stat-item" style={{display: 'flex', justifyContent: 'space-between', padding: '0.8rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)'}}>
+                          <span className="text-muted">Stars Earned</span>
+                          <strong style={{color: 'white'}}>{result.stats.stars}</strong>
+                        </div>
+                        <div className="stat-item" style={{display: 'flex', justifyContent: 'space-between', padding: '0.8rem 0'}}>
+                          <span className="text-muted">Monthly Avg</span>
+                          <strong style={{color: 'var(--accent)'}}>{result.stats.velocity_per_month}</strong>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+                    </div>
 
-              <div className="card insights-card">
-                <h3>Screening Insights</h3>
-                <ul className="bullet-list">
-                  {result.screening_insights.map((insight, idx) => (
-                    <li key={idx} className={insight.toLowerCase().includes('warning') ? 'insight-warning' : ''}>
-                      {insight}
-                    </li>
-                  ))}
-                </ul>
+                    <div className="card tech-card" style={{padding: '2rem'}}>
+                      <h3 className="section-title" style={{color: 'var(--accent-secondary)'}}>Stack Dominance</h3>
+                      <div className="tech-stack-list" style={{marginTop: '1.5rem'}}>
+                        {result.technical_stack.map(([lang, count], idx) => (
+                          <div key={idx} className="tech-item" style={{marginBottom: '1rem'}}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem'}}>
+                               <span style={{fontWeight: '700'}}>{lang}</span>
+                            </div>
+                            <div className="skill-bar-bg" style={{height: '4px', background: 'rgba(255,255,255,0.05)'}}>
+                              <div 
+                                style={{width: `${(count / Math.max(...result.technical_stack.map(s => s[1]))) * 100}%`, background: 'var(--accent-secondary)', height: '100%'}}
+                              ></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                 </div>
+
+                 <div className="details-stack" style={{gap: '1.5rem'}}>
+                    <div className="card strengths-card">
+                       <h4 style={{color: 'var(--success)', marginBottom: '1rem'}}>Core Strengths</h4>
+                       <ul className="bullet-list">
+                          {result.strengths.map((s, idx) => (
+                             <li key={idx} style={{fontSize: '0.85rem', padding: '0.6rem 0.8rem 0.6rem 2.2rem'}}>{s}</li>
+                          ))}
+                       </ul>
+                    </div>
+
+                    <div className="card weaknesses-card">
+                       <h4 style={{color: 'var(--warning)', marginBottom: '1rem'}}>Observation Nodes</h4>
+                       <ul className="bullet-list">
+                          {result.weaknesses.map((w, idx) => (
+                             <li key={idx} style={{fontSize: '0.85rem', padding: '0.6rem 0.8rem 0.6rem 2.2rem'}}>{w}</li>
+                          ))}
+                       </ul>
+                    </div>
+
+                    <div className="card screening-card" style={{background: 'rgba(255,255,255,0.01)'}}>
+                       <h4 style={{marginBottom: '1rem'}}>Verification Verdict</h4>
+                       <div className="insights-list">
+                          {result.screening_insights.map((insight, idx) => (
+                            <div key={idx} style={{padding: '0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid var(--border-color)', marginBottom: '0.6rem', fontSize: '0.9rem', color: insight.includes('Warning') ? 'var(--warning)' : 'var(--text-muted)'}}>
+                               {insight}
+                            </div>
+                          ))}
+                       </div>
+                    </div>
+                 </div>
               </div>
             </div>
           )}
+
+
         </section>
       </div>
     </div>

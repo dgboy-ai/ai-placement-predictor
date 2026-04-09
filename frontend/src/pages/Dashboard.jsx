@@ -54,35 +54,37 @@ export default function Dashboard() {
       <div className="dashboard-grid">
         <section className="dashboard-form">
           <div className="card">
-            <h2>Profile Details</h2>
+            <h2 style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem'}}>
+              <span style={{fontSize: '2.5rem'}}>📊</span> Profile Details
+            </h2>
             <form onSubmit={handleSubmit} className="input-form">
               {/* --- SECTION: Academic Details --- */}
               <div className="form-section">
                 <h3 className="section-title">Academic Details</h3>
                 
-                <div className="form-group mb-4">
-                  <div className="label-row">
-                    <label>CGPA</label>
+                <div className="form-group mb-5">
+                  <div className="label-row" style={{alignItems: 'flex-end', marginBottom: '0'}}>
+                    <label style={{fontSize: '1rem', fontWeight: '700', color: 'white'}}>Current CGPA</label>
                     <span className="live-value">{formData.cgpa || 0}</span>
                   </div>
                   <input type="range" name="cgpa" value={formData.cgpa} onChange={handleChange} min="0" max="10" step="0.1" className="styled-slider" />
                 </div>
 
-                <div className="grid-2-cols mb-4">
+                <div className="grid-2-cols mb-5">
                   <div className="form-group">
-                    <div className="label-row">
-                      <label>Attendance (%)</label>
+                    <div className="label-row" style={{alignItems: 'flex-end', marginBottom: '0'}}>
+                      <label style={{fontSize: '0.9rem', fontWeight: '700'}}>Attendance</label>
                       <span className="live-value">{formData.attendance || 0}%</span>
                     </div>
                     <input type="range" name="attendance" value={formData.attendance} onChange={handleChange} min="0" max="100" className="styled-slider" />
                   </div>
-                  <div className="form-group">
-                    <label>Backlogs</label>
+                  <div className="form-group" style={{justifyContent: 'flex-end'}}>
+                    <label style={{marginBottom: '0.8rem'}}>Backlogs</label>
                     <select name="backlogs" value={formData.backlogs} onChange={handleChange} className="styled-select">
-                      <option value="0">0</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3+</option>
+                      <option value="0">Zero Backlogs</option>
+                      <option value="1">1 Backlog</option>
+                      <option value="2">2 Backlogs</option>
+                      <option value="3">3+ Backlogs</option>
                     </select>
                   </div>
                 </div>
@@ -92,50 +94,49 @@ export default function Dashboard() {
               <div className="form-section mb-5">
                 <h3 className="section-title">Skills &amp; Experience</h3>
                 
-                <div className="grid-2-cols mb-4">
-                  <div className="form-group">
-                    <div className="label-row">
-                      <label>Technical Skills Level</label>
-                      <span className="live-value">{formData.skills_score || 0}</span>
-                    </div>
-                    <input type="range" name="skills_score" value={formData.skills_score} onChange={handleChange} min="0" max="10" step="0.1" className="styled-slider" />
+                <div className="form-group mb-5">
+                  <div className="label-row" style={{alignItems: 'flex-end', marginBottom: '0'}}>
+                    <label style={{fontSize: '0.9rem', fontWeight: '700'}}>Technical Skills Level</label>
+                    <span className="live-value" style={{background: 'rgba(168, 85, 247, 0.3)', borderColor: 'rgba(168, 85, 247, 0.5)'}}>{formData.skills_score || 0}</span>
                   </div>
-                  <div className="form-group">
-                    <div className="label-row">
-                      <label>Communication Skills</label>
-                      <span className="live-value">{formData.communication_score || 0}</span>
-                    </div>
-                    <input type="range" name="communication_score" value={formData.communication_score} onChange={handleChange} min="0" max="10" step="0.1" className="styled-slider" />
+                  <input type="range" name="skills_score" value={formData.skills_score} onChange={handleChange} min="0" max="10" step="0.1" className="styled-slider" />
+                </div>
+
+                <div className="form-group mb-5">
+                  <div className="label-row" style={{alignItems: 'flex-end', marginBottom: '0'}}>
+                    <label style={{fontSize: '0.9rem', fontWeight: '700'}}>Communication Proficiency</label>
+                    <span className="live-value" style={{background: 'rgba(14, 165, 233, 0.3)', borderColor: 'rgba(14, 165, 233, 0.5)'}}>{formData.communication_score || 0}</span>
                   </div>
+                  <input type="range" name="communication_score" value={formData.communication_score} onChange={handleChange} min="0" max="10" step="0.1" className="styled-slider" />
                 </div>
 
                 <div className="grid-2-cols">
                   <div className="form-group">
-                    <label>Internships</label>
+                    <label style={{marginBottom: '0.8rem'}}>Internships</label>
                     <select name="internships" value={formData.internships} onChange={handleChange} className="styled-select">
-                      <option value="0">0</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3+</option>
+                      <option value="0">No Internships</option>
+                      <option value="1">1 Internship</option>
+                      <option value="2">2 Internships</option>
+                      <option value="3">3+ Internships</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Projects</label>
+                    <label style={{marginBottom: '0.8rem'}}>Hands-on Projects</label>
                     <select name="projects" value={formData.projects} onChange={handleChange} className="styled-select">
-                      <option value="0">0</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3+</option>
+                      <option value="0">No Projects</option>
+                      <option value="1">1 Project</option>
+                      <option value="2">2 Projects</option>
+                      <option value="3">3+ Projects</option>
                     </select>
                   </div>
                 </div>
               </div>
               
-              <button type="submit" className="submit-btn" disabled={loading}>
+              <button type="submit" className="submit-btn" disabled={loading} style={{padding: '1.5rem', fontSize: '1.4rem'}}>
                 {loading ? (
-                  <><span className="spinner"></span> Analyzing...</>
+                  <><span className="spinner"></span> Running AI Defense...</>
                 ) : (
-                  'Predict Placement'
+                  'Predict My Future'
                 )}
               </button>
             </form>
@@ -145,20 +146,27 @@ export default function Dashboard() {
 
         <section className="dashboard-results">
           {!result && !loading && (
-            <div className="placeholder-result card fade-in">
-              <div className="placeholder-icon">🚀</div>
-              <h3>Awaiting Input</h3>
-              <p>Fill out the form on the left and click predict to generate your comprehensive analysis.</p>
+            <div className="placeholder-result card fade-in" style={{borderStyle: 'solid', background: 'rgba(30, 41, 59, 0.3)', borderColor: 'rgba(255,255,255,0.05)'}}>
+              <div className="placeholder-icon">📊</div>
+              <h3 style={{fontSize: '2.5rem', fontWeight: '900', letterSpacing: '-1px'}}>Ready to Transform?</h3>
+              <p style={{maxWidth: '500px', margin: '0 auto', fontSize: '1.2rem', color: '#94a3b8', lineHeight: '1.8'}}>
+                Complete your profile on the left to unlock deep learning powered insights into your placement probability and career roadmap.
+              </p>
+              <div style={{marginTop: '3rem', display: 'flex', justifyContent: 'center', gap: '1rem'}}>
+                 <span style={{padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '999px', fontSize: '0.9rem'}}>8 Features Analyzed</span>
+                 <span style={{padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '999px', fontSize: '0.9rem'}}>Deterministic Results</span>
+              </div>
             </div>
           )}
           
           {loading && !result && (
             <div className="placeholder-result loading-result card fade-in">
-              <span className="spinner large-spinner"></span>
-              <h3>Processing Profile...</h3>
-              <p>The AI model is generating predictions, insights, and your personalized roadmap.</p>
+              <span className="spinner large-spinner" style={{borderColor: 'rgba(14, 165, 233, 0.2)', borderTopColor: 'var(--accent)'}}></span>
+              <h3 style={{fontSize: '2.5rem', fontWeight: '900'}}>Simulating Scenarios...</h3>
+              <p style={{fontSize: '1.2rem'}}>Our AI is crunching your data to find the optimal career path.</p>
             </div>
           )}
+
           
           {result && (
             <div className="results-section">
