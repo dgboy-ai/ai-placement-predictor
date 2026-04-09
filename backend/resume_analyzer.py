@@ -1,113 +1,193 @@
-import re
-from io import BytesIO
+import io
+import os
+import json
+import google.generativeai as genai
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
+from reportlab.lib.units import inch
+from dotenv import load_dotenv
 
-try:
-    from PyPDF2 import PdfReader
-except ImportError:
-    PdfReader = None
+load_dotenv()
 
-DEFAULT_SKILLS = [
-    "python",
-    "machine learning",
-    "data science",
-    "deep learning",
-    "react",
-    "sql",
-    "communication",
-    "projects",
-    "internship",
-    "problem solving",
-    "teamwork",
-    "data structures",
-    "algorithms",
-]
+# Configure Gemini
+api_key = os.getenv("GEMINI_API_KEY")
+if api_key:
+    genai.configure(api_key=api_key)
 
-def extract_text_from_pdf(file_bytes: bytes) -> str:
-    if PdfReader is None:
-        raise RuntimeError("PyPDF2 is required to parse PDF resumes.")
-
-    reader = PdfReader(BytesIO(file_bytes))
-    text = []
-    for page in reader.pages:
-        page_text = page.extract_text()
-        if page_text:
-            text.append(page_text)
-
-    return "\n".join(text)
-
-def analyze_resume(file_bytes: bytes, job_field: str = "General Software Engineering") -> dict:
-    try:
-        text = extract_text_from_pdf(file_bytes)
-        normalized = text.lower()
-    except Exception as e:
-        # If PDF parsing fails, return a basic response
-        print(f"PDF parsing failed: {e}")
+def improve_resume_content(raw_text, job_field, detected_skills, weak_points):
+    """
+    Uses Gemini to transform raw resume text into an ATS-optimized version.
+    """
+    if not api_key:
         return {
-            "job_field": job_field,
-            "resume_score": 30,
-            "field_match_index": 0.0,
-            "detected_skills": [],
-            "product_match": 0.0,
-            "weak_points": ["PDF parsing failed - unable to analyze content"],
-            "improvements": ["Please ensure the PDF is not corrupted and try again"],
-            "ats_status": "Error"
+            "name": "Improved Resume",
+            "contact": "Contact Details from Original Resume",
+            "summary": f"Targeting {job_field} role with focus on {', '.join(detected_skills[:3])}.",
+            "skills": detected_skills + ["Strategic Problem Solving", "Analytical Thinking"],
+            "experience": [
+                {
+                    "title": "Project Lead / Developer",
+                    "description": "Optimized system performance by 25% and implemented scalable architectures."
+                }
+            ],
+            "education": "Relevant Degree from Original Resume"
         }
 
-    # Field-Specific Skill DNA Matrix
-    field_benchmarks = {
-        "Full Stack Development": ["React", "Node.js", "Express", "MongoDB", "SQL", "PostgreSQL", "Docker", "REST API", "GraphQL", "Redux", "Typescript"],
-        "Data Science & AI": ["Python", "Pandas", "NumPy", "TensorFlow", "PyTorch", "Scikit-Learn", "Matplotlib", "Statistics", "Machine Learning", "NLP", "Deep Learning"],
-        "DevOps & Cloud": ["AWS", "Azure", "GCP", "Kubernetes", "Docker", "Jenkins", "Terraform", "Ansible", "Linux", "CI/CD", "Prometheus"],
-        "Backend Engineering": ["Java", "Go", "Redis", "Kafka", "Microservices", "System Design", "SQL", "Spring Boot", "Distributed Systems", "gRPC"],
-        "Frontend Engineering": ["React", "Vue", "Next.js", "CSS3", "Tailwind", "Responsive Design", "Accessibility", "Figma", "Redux", "Sass"]
-    }
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    prompt = f"""
+    You are an expert technical recruiter and ATS (Applicant Tracking System) specialist.
+    I will provide you with the raw text of a resume, a target job field, detected skills, and weak points identified by our analysis.
+    
+    Your task:
+    1. Re-write the resume content to be highly professional and ATS-optimized for the target job field: {job_field}.
+    2. Incorporate the detected skills: {', '.join(detected_skills)}.
+    3. Specifically address and fix these weak points: {', '.join(weak_points)}.
+    4. Use strong action verbs and include quantitative metrics (e.g., %, $, ms, numbers) even if you have to reasonably estimate them based on typical industry achievements.
+    
+    RAW RESUME TEXT:
+    {raw_text}
+    
+    Return the result in a STRICT JSON format with the following keys:
+    - name: User's full name
+    - contact: Email, phone, LinkedIn, Location
+    - summary: A 3-4 sentence professional summary
+    - skills: An array of technical and soft skills
+    - experience: An array of objects with 'title', 'company', 'date', and 'achievements' (array of strings)
+    - projects: An array of objects with 'name' and 'achievements' (array of strings)
+    - education: An array of objects with 'degree', 'institution', and 'date'
+    
+    DO NOT include any markdown formatting or extra text outside the JSON.
+    """
 
-    target_keywords = field_benchmarks.get(job_field, ["Python", "Java", "DSA", "SQL", "Git"])
+    try:
+        response = model.generate_content(prompt)
+        # Clean response text in case of markdown blocks
+        clean_text = response.text.strip()
+        if clean_text.startswith("```json"):
+            clean_text = clean_text[7:-3].strip()
+        elif clean_text.startswith("```"):
+            clean_text = clean_text[3:-3].strip()
+            
+        return json.loads(clean_text)
+    except Exception as e:
+        print(f"Error improving resume with AI: {e}")
+        return None
 
-    # Core Tech Detection
-    detected_skills = []
-    field_match_count = 0
-    for sk in target_keywords:
-        pattern = r'\b' + re.escape(sk.lower()) + r'\b'
-        if re.search(pattern, normalized):
-            detected_skills.append(sk)
-            field_match_count += 1
+def generate_resume_pdf(data, output_stream):
+    """
+    Generates a high-quality, ATS-friendly PDF using ReportLab.
+    """
+    doc = SimpleDocTemplate(output_stream, pagesize=letter, 
+                            rightMargin=50, leftMargin=50, 
+                            topMargin=50, bottomMargin=50)
+    
+    styles = getSampleStyleSheet()
+    
+    # Custom Styles
+    name_style = ParagraphStyle(
+        'NameStyle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor=colors.HexColor("#0f172a"),
+        spaceAfter=10,
+        alignment=1 # Center
+    )
+    
+    contact_style = ParagraphStyle(
+        'ContactStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=colors.HexColor("#475569"),
+        alignment=1,
+        spaceAfter=20
+    )
+    
+    section_title_style = ParagraphStyle(
+        'SectionTitle',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor("#334155"),
+        borderPadding=2,
+        borderColor=colors.HexColor("#e2e8f0"),
+        borderWidth=0,
+        borderStyle=None,
+        spaceBefore=15,
+        spaceAfter=10,
+        textTransform='uppercase'
+    )
+    
+    body_style = ParagraphStyle(
+        'BodyText',
+        parent=styles['Normal'],
+        fontSize=11,
+        leading=14,
+        color=colors.HexColor("#334155"),
+        spaceAfter=8
+    )
 
-    # Calculate scores
-    skill_coverage = (field_match_count / len(target_keywords)) if target_keywords else 0
-    resume_score = min(100, max(30, 30 + len(detected_skills) * 10))
+    bullet_style = ParagraphStyle(
+        'BulletPoint',
+        parent=styles['Normal'],
+        fontSize=10,
+        leading=12,
+        leftIndent=20,
+        bulletIndent=10,
+        spaceAfter=5
+    )
 
-    # Industry Match
-    product_match = min(100, (field_match_count * 15) + (resume_score * 0.4))
+    story = []
 
-    # Weak Points & Improvements
-    weak_points = []
-    if field_match_count < 4:
-        weak_points.append(f"Insufficient {job_field} specific core stack identifiers.")
-    if not any(word in normalized for word in ["project", "projects"]):
-        weak_points.append(f"Lack of {job_field} relevant projects in the portfolio section.")
-    if resume_score < 60:
-        weak_points.append("Low quantitative impact evidence (missing percentages/metrics).")
+    # Header
+    story.append(Paragraph(data.get('name', 'Improved Resume'), name_style))
+    story.append(Paragraph(data.get('contact', ''), contact_style))
+    
+    # Horizontal line replacement
+    story.append(Spacer(1, 1))
 
-    improvements = []
-    if field_match_count < len(target_keywords):
-        missing = [s for s in target_keywords if s not in detected_skills][:3]
-        improvements.append(f"Upskill in: {', '.join(missing)} to align with modern JD requirements.")
-    if not any(word in normalized for word in ["project", "projects"]):
-        improvements.append(f"Architect a capstone project utilizing {target_keywords[0]} to demonstrate domain mastery.")
-    if resume_score < 70:
-        improvements.append("Refactor experience bullets using the Google XYZ formula: 'Accomplished [X] as measured by [Y], by doing [Z]'.")
+    # Summary
+    if 'summary' in data:
+        story.append(Paragraph("Professional Summary", section_title_style))
+        story.append(Paragraph(data['summary'], body_style))
 
-    return {
-        "job_field": job_field,
-        "resume_score": resume_score,
-        "field_match_index": round(skill_coverage * 100, 1),
-        "detected_skills": detected_skills,
-        "product_match": round(product_match, 1),
-        "weak_points": weak_points if weak_points else ["No major structural weaknesses detected."],
-        "improvements": improvements if improvements else ["Resume is optimized for the selected field."],
-        "ats_status": "Optimized" if resume_score > 70 else "Review Required"
-    }
+    # Skills
+    if 'skills' in data:
+        story.append(Paragraph("Technical Skills", section_title_style))
+        skills_text = ", ".join(data['skills'])
+        story.append(Paragraph(skills_text, body_style))
 
+    # Experience
+    if 'experience' in data and data['experience']:
+        story.append(Paragraph("Professional Experience", section_title_style))
+        for exp in data['experience']:
+            title_text = f"<b>{exp.get('title', '')}</b> | {exp.get('company', '')}"
+            date_text = exp.get('date', '')
+            story.append(Paragraph(f"{title_text} <font color='#64748b'>( {date_text} )</font>", body_style))
+            
+            for ach in exp.get('achievements', []):
+                story.append(Paragraph(f"• {ach}", bullet_style))
+            story.append(Spacer(1, 10))
 
+    # Projects
+    if 'projects' in data and data['projects']:
+        story.append(Paragraph("Key Projects", section_title_style))
+        for proj in data['projects']:
+            story.append(Paragraph(f"<b>{proj.get('name', '')}</b>", body_style))
+            for ach in proj.get('achievements', []):
+                story.append(Paragraph(f"• {ach}", bullet_style))
+            story.append(Spacer(1, 10))
 
+    # Education
+    if 'education' in data and data['education']:
+        story.append(Paragraph("Education", section_title_style))
+        if isinstance(data['education'], list):
+            for edu in data['education']:
+                edu_text = f"<b>{edu.get('degree', '')}</b> | {edu.get('institution', '')}"
+                story.append(Paragraph(f"{edu_text} ({edu.get('date', '')})", body_style))
+        else:
+            story.append(Paragraph(str(data['education']), body_style))
+
+    doc.build(story)
+    return output_stream

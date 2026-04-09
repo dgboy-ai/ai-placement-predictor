@@ -7,10 +7,42 @@ export default function ResumeAnalyzer() {
   const [customField, setCustomField] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [improving, setImproving] = useState(false);
   const [error, setError] = useState('');
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+  };
+
+  const handleDownloadImproved = async () => {
+    if (!file) return;
+    
+    setImproving(true);
+    const finalField = fieldSelection === 'Other' ? customField : fieldSelection;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('job_field', finalField);
+    
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/improve-resume', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Improved_Resume_${finalField.replace(' ', '_')}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to generate improved resume PDF.');
+    } finally {
+      setImproving(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -166,15 +198,37 @@ export default function ResumeAnalyzer() {
                  }}>
                     <div style={{fontSize: '3.5rem', fontWeight: '900', color: 'var(--primary)'}}>{result.resume_score}<span style={{fontSize: '1rem', verticalAlign: 'middle'}}>%</span></div>
                  </div>
-                 <div style={{flex: 1}}>
-                    <span style={{fontSize: '0.85rem', color: 'var(--primary)', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px'}}>Readiness Score</span>
-                    <h3 style={{fontSize: '3rem', marginTop: '0.5rem', fontFamily: 'var(--font-heading)'}}>{result.ats_status}</h3>
-                    <div className="badges mt-3" style={{display: 'flex', gap: '1rem'}}>
-                      <span className="badge" style={{background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.2)'}}>
-                        Target: {result.job_field}
-                      </span>
-                    </div>
-                 </div>
+                  <div style={{flex: 1}}>
+                     <span style={{fontSize: '0.85rem', color: 'var(--primary)', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px'}}>Readiness Score</span>
+                     <h3 style={{fontSize: '3rem', marginTop: '0.5rem', fontFamily: 'var(--font-heading)'}}>{result.ats_status}</h3>
+                     <div className="badges mt-3" style={{display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap'}}>
+                       <span className="badge" style={{background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.2)'}}>
+                         Target: {result.job_field}
+                       </span>
+                       <button 
+                         onClick={handleDownloadImproved} 
+                         disabled={improving}
+                         className="btn-link"
+                         style={{
+                           background: 'var(--primary)',
+                           color: 'white',
+                           border: 'none',
+                           padding: '0.6rem 1.2rem',
+                           borderRadius: '8px',
+                           fontSize: '0.85rem',
+                           fontWeight: '700',
+                           cursor: 'pointer',
+                           display: 'flex',
+                           gap: '0.5rem',
+                           alignItems: 'center',
+                           marginLeft: 'auto',
+                           boxShadow: '0 4px 15px rgba(var(--primary-rgb), 0.3)'
+                         }}
+                       >
+                         {improving ? <><span className="spinner" style={{width: '14px', height: '14px'}}></span> Improving...</> : <>✨ Download Improved Resume (ATS Focus)</>}
+                       </button>
+                     </div>
+                  </div>
                </div>
 
                <div className="features-grid" style={{gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem'}}>
