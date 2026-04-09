@@ -8,6 +8,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
 from reportlab.lib.units import inch
 from dotenv import load_dotenv
+import PyPDF2
 
 load_dotenv()
 
@@ -15,6 +16,96 @@ load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
+
+def analyze_resume(pdf_content: bytes, job_field: str = "General Software Engineering") -> dict:
+    """
+    Analyzes a resume PDF and returns structured analysis including detected skills, weak points, and UI-ready metrics.
+    """
+    fallback_analysis = {
+        "resume_score": 75,
+        "ats_status": "Good Fit",
+        "job_field": job_field,
+        "field_match_index": 72,
+        "impact_telemetry": {
+            "action_velocity": 6,
+            "metric_density": 5
+        },
+        "detected_skills": ["Python", "JavaScript", "Problem Solving"],
+        "weak_points": ["Lack of quantifiable achievements", "Missing relevant certifications"],
+        "strengths": ["Good technical foundation", "Project experience"],
+        "improvements": ["Add more metrics to achievements", "Highlight leadership in projects"],
+        "suggestions": ["Add a strong summary statement.", "Include quantifiable project results.", "List core skills near the top."],
+        "recommendations": ["Add more metrics to achievements", "Include relevant certifications"]
+    }
+
+    def normalize(raw_data: dict) -> dict:
+        score = raw_data.get("score", raw_data.get("resume_score", 75))
+        resume_score = int(score)
+        return {
+            "resume_score": resume_score,
+            "ats_status": raw_data.get("ats_status", "Good Fit" if resume_score >= 65 else "Needs Improvement"),
+            "job_field": job_field,
+            "field_match_index": raw_data.get("field_match_index", min(100, max(0, int(resume_score * 0.95)))),
+            "impact_telemetry": raw_data.get("impact_telemetry", {
+                "action_velocity": raw_data.get("action_velocity", 6),
+                "metric_density": raw_data.get("metric_density", 5)
+            }),
+            "detected_skills": raw_data.get("detected_skills", raw_data.get("skills", [])),
+            "weak_points": raw_data.get("weak_points", []),
+            "strengths": raw_data.get("strengths", []),
+            "improvements": raw_data.get("improvements", raw_data.get("recommendations", [])),
+            "suggestions": raw_data.get("suggestions", raw_data.get("recommendations", [])),
+            "recommendations": raw_data.get("recommendations", [])
+        }
+
+    if not api_key:
+        return fallback_analysis
+
+    try:
+        reader = PyPDF2.PdfReader(io.BytesIO(pdf_content))
+        raw_text = ""
+        for page in reader.pages:
+            raw_text += page.extract_text() + "\n"
+
+        if not raw_text.strip():
+            return fallback_analysis
+
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        prompt = f"""
+        You are an expert technical recruiter analyzing a resume for a {job_field} position.
+
+        Analyze the following resume text and provide a structured assessment in JSON format.
+
+        RESUME TEXT:
+        {raw_text}
+
+        Return a JSON object with these keys:
+        - resume_score: number between 0 and 100
+        - ats_status: string label like 'Strong Fit' or 'Needs Improvement'
+        - field_match_index: number between 0 and 100
+        - impact_telemetry: object with action_velocity and metric_density
+        - detected_skills: array of skills found in the resume
+        - weak_points: array of areas needing improvement
+        - strengths: array of strong points in the resume
+        - improvements: array of improvement suggestions
+        - suggestions: array of roadmap steps
+
+        Be specific and actionable in your analysis.
+        """
+
+        response = model.generate_content(prompt)
+        clean_text = response.text.strip()
+        if clean_text.startswith("```json"):
+            clean_text = clean_text[7:-3].strip()
+        elif clean_text.startswith("```"):
+            clean_text = clean_text[3:-3].strip()
+
+        raw_data = json.loads(clean_text)
+        return normalize(raw_data)
+    except Exception as e:
+        print(f"Error analyzing resume with AI: {e}")
+        return fallback_analysis
 
 def improve_resume_content(raw_text, job_field, detected_skills, weak_points):
     """

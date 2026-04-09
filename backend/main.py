@@ -8,25 +8,20 @@ import uvicorn
 import io
 import PyPDF2
 from fastapi.responses import StreamingResponse
+import sys
+from pathlib import Path
+
+# Add parent directory to sys.path to enable imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # 1. Imports mapping
-try:
-    from model import train_model 
-    from explanation import generate_explanation
-    from roadmap import generate_roadmap
-    from insights import generate_insights
-    from resume_analyzer import analyze_resume
-    from github_analyzer import analyze_github_profile
-    from resume_improver import improve_resume_content, generate_resume_pdf
-except ImportError:
-    # Handle optional subdirectory structure
-    from backend.model import train_model
-    from backend.explanation import generate_explanation
-    from backend.roadmap import generate_roadmap
-    from backend.insights import generate_insights
-    from backend.resume_analyzer import analyze_resume
-    from backend.github_analyzer import analyze_github_profile
-    from backend.resume_improver import improve_resume_content, generate_resume_pdf
+from backend.model import train_model 
+from backend.explanation import generate_explanation
+from backend.roadmap import generate_roadmap
+from backend.insights import generate_insights
+from backend.resume_analyzer import analyze_resume
+from backend.github_analyzer import analyze_github_profile
+from backend.resume_improver import improve_resume_content, generate_resume_pdf
 
 # Global variables to store the loaded model, scaler, and features list
 model, scaler, feature_names = None, None, None
