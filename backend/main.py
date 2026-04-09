@@ -60,16 +60,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.get("/")
-def read_root():
-    return {
-        "status": "Solox Intelligence Engine Online",
-        "engine": "Multi-Layer Perceptron (Neural Network)",
-        "prediction_certainty": "96.4% (5-fold Cross-Validated)",
-        "dataset_fidelity": "7,500 High-Density Career Profiles"
-    }
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  

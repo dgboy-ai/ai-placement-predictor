@@ -140,8 +140,4 @@ def analyze_github_profile(input_text: str, job_field: str = "General Software E
         return {"error": f"Deep analysis failure: {str(e)}"}
 
 
-    except Exception as e:
-        return {"error": f"Deep analysis failure: {str(e)}"}
-
-
 

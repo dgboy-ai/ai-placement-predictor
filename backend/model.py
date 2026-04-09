@@ -61,15 +61,13 @@ def generate_dataset(n=7500):
 
 def get_mlp_feature_importance(model, feature_names):
     """Calculates feature importance proxy for MLP using the sum of absolute weights from the first hidden layer."""
-    # First layer weights: (n_features, n_hidden_1)
     weights = np.abs(model.coefs_[0])
     importance = np.sum(weights, axis=1)
-    # Normalize
     importance = importance / np.sum(importance)
     return importance
 
 def train_model():
-    """Trains a state-of-the-art Deep Learning MLP and validates accuracy for certainty."""
+    """Trains a state-of-the-art Deep Learning MLP and validates accuracy."""
     df = generate_dataset()
     
     feature_names = [
@@ -95,13 +93,10 @@ def train_model():
         alpha=1e-5
     )
     
-    # Cross-validation to ensure "Certainty"
     cv_scores = cross_val_score(model, X_scaled, y, cv=5)
     print(f"DL Model Cross-Validation Certainty: {np.mean(cv_scores):.4f} (+/- {np.std(cv_scores):.4f})")
     
     model.fit(X_scaled, y)
-    
-    # Inject importance logic into the model object so explanation.py can use it
     model.feature_importances_ = get_mlp_feature_importance(model, feature_names)
     
     return model, scaler, feature_names
