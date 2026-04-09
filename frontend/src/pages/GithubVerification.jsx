@@ -3,7 +3,8 @@ import axios from 'axios';
 
 export default function GithubVerification() {
   const [githubLink, setGithubLink] = useState('');
-  const [jobField, setJobField] = useState('General Software Engineering');
+  const [fieldSelection, setFieldSelection] = useState('General Software Engineering');
+  const [customField, setCustomField] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -14,13 +15,20 @@ export default function GithubVerification() {
       setError('Please provide a GitHub profile link.');
       return;
     }
+    
+    const finalField = fieldSelection === 'Other' ? customField : fieldSelection;
+    if (!finalField) {
+      setError('Please provide a target job field.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     
     try {
       const response = await axios.post('http://127.0.0.1:8000/analyze-github', {
         github_link: githubLink,
-        job_field: jobField
+        job_field: finalField
       });
       setResult(response.data);
     } catch (err) {
@@ -63,13 +71,33 @@ export default function GithubVerification() {
 
               <div className="form-group mb-5">
                 <label style={{fontSize: '0.8rem', opacity: 0.7, textTransform: 'uppercase'}}>Target Job Field</label>
-                <input 
-                  type="text" 
-                  value={jobField} 
-                  onChange={(e) => setJobField(e.target.value)}
-                  placeholder="e.g. Backend Developer"
-                  className="styled-input"
-                />
+                <div style={{position: 'relative'}}>
+                  <select 
+                    className="styled-input" 
+                    value={fieldSelection} 
+                    onChange={(e) => setFieldSelection(e.target.value)}
+                    style={{appearance: 'auto', background: 'rgba(255,255,255,0.05)', color: 'white', padding: '1.2rem', cursor: 'pointer', display: 'block', width: '100%', marginBottom: '0.5rem'}}
+                  >
+                    <option value="General Software Engineering" style={{background: '#1e293b'}}>General Software Engineering</option>
+                    <option value="Frontend Development" style={{background: '#1e293b'}}>Frontend Development</option>
+                    <option value="Backend Development" style={{background: '#1e293b'}}>Backend Development</option>
+                    <option value="Full Stack Development" style={{background: '#1e293b'}}>Full Stack Development</option>
+                    <option value="Data Science" style={{background: '#1e293b'}}>Data Science</option>
+                    <option value="Cybersecurity" style={{background: '#1e293b'}}>Cybersecurity</option>
+                    <option value="Other" style={{background: '#1e293b'}}>Other...</option>
+                  </select>
+                </div>
+                
+                {fieldSelection === 'Other' && (
+                  <input 
+                    type="text" 
+                    placeholder="Enter your field (e.g. DevOps)"
+                    className="styled-input mt-2 fade-in"
+                    value={customField}
+                    onChange={(e) => setCustomField(e.target.value)}
+                    style={{border: '1px solid var(--accent)', background: 'rgba(14, 165, 233, 0.05)'}}
+                  />
+                )}
               </div>
 
               <button type="submit" className="submit-btn" disabled={loading} style={{padding: '1.2rem', fontSize: '1.1rem', background: 'var(--primary)', fontWeight: '700'}}>

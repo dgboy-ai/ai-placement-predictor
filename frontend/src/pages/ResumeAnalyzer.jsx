@@ -3,7 +3,8 @@ import axios from 'axios';
 
 export default function ResumeAnalyzer() {
   const [file, setFile] = useState(null);
-  const [jobField, setJobField] = useState('General Software Engineering');
+  const [fieldSelection, setFieldSelection] = useState('General Software Engineering');
+  const [customField, setCustomField] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,12 +19,20 @@ export default function ResumeAnalyzer() {
       setError('Please select a PDF resume first.');
       return;
     }
+    
+    // Determine the final job field to send
+    const finalField = fieldSelection === 'Other' ? customField : fieldSelection;
+    if (!finalField) {
+      setError('Please provide a target job field.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('job_field', jobField);
+    formData.append('job_field', finalField);
     
     try {
       const response = await axios.post('http://127.0.0.1:8000/analyze-resume', formData, {
@@ -59,13 +68,33 @@ export default function ResumeAnalyzer() {
             <form onSubmit={handleSubmit} className="input-form">
               <div className="form-group mb-4">
                 <label style={{fontSize: '0.8rem', opacity: 0.7, textTransform: 'uppercase'}}>Target Job Field</label>
-                <input 
-                  type="text" 
-                  value={jobField} 
-                  onChange={(e) => setJobField(e.target.value)}
-                  placeholder="e.g. Frontend Developer"
-                  className="styled-input"
-                />
+                <div style={{position: 'relative'}}>
+                  <select 
+                    className="styled-input" 
+                    value={fieldSelection} 
+                    onChange={(e) => setFieldSelection(e.target.value)}
+                    style={{appearance: 'auto', background: 'rgba(255,255,255,0.05)', color: 'white', padding: '1.2rem', cursor: 'pointer', display: 'block', width: '100%', marginBottom: '0.5rem'}}
+                  >
+                    <option value="General Software Engineering" style={{background: '#1e293b'}}>General Software Engineering</option>
+                    <option value="Frontend Development" style={{background: '#1e293b'}}>Frontend Development</option>
+                    <option value="Backend Development" style={{background: '#1e293b'}}>Backend Development</option>
+                    <option value="Full Stack Development" style={{background: '#1e293b'}}>Full Stack Development</option>
+                    <option value="Data Science" style={{background: '#1e293b'}}>Data Science</option>
+                    <option value="Cybersecurity" style={{background: '#1e293b'}}>Cybersecurity</option>
+                    <option value="Other" style={{background: '#1e293b'}}>Other...</option>
+                  </select>
+                </div>
+                
+                {fieldSelection === 'Other' && (
+                  <input 
+                    type="text" 
+                    placeholder="Enter your field (e.g. DevOps)"
+                    className="styled-input mt-2 fade-in"
+                    value={customField}
+                    onChange={(e) => setCustomField(e.target.value)}
+                    style={{border: '1px solid var(--accent)', background: 'rgba(14, 165, 233, 0.05)'}}
+                  />
+                )}
               </div>
 
               <div className="form-group mb-5">
@@ -98,16 +127,16 @@ export default function ResumeAnalyzer() {
               </div>
 
               <button type="submit" className="submit-btn" disabled={loading} style={{padding: '1.2rem', fontSize: '1.1rem', background: 'var(--primary)', fontWeight: '700'}}>
-                 {loading ? <><span className="spinner"></span> Checking...</> : 'Check My Resume 🚀'}
+                 {loading ? <><span className="spinner"></span> Analyzing...</> : 'Analyze Resume 🚀'}
               </button>
             </form>
             {error && <div className="error-message mt-3">{error}</div>}
           </div>
 
           <div className="card frosted-card mt-4" style={{padding: '1.5rem', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.05)'}}>
-             <h4 style={{fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '1.2rem', letterSpacing: '1.5px', fontWeight: '900'}}>Platform Tip</h4>
+             <h4 style={{fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '1.2rem', letterSpacing: '1.5px', fontWeight: '900'}}>Pro Tip</h4>
              <p style={{fontSize: '0.85rem', color: '#64748b', lineHeight: '1.6'}}>
-                Results are based on industry standards and data from 7,500+ successful career resumes.
+                Make sure your resume includes clear project descriptions and measurable impact to get the best match results.
              </p>
           </div>
         </aside>
@@ -116,18 +145,18 @@ export default function ResumeAnalyzer() {
           {!result && !loading && (
              <div className="placeholder-result card frosted-card" style={{marginTop: 0, minHeight: '520px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
                 <div style={{fontSize: '5rem', marginBottom: '2rem'}}>📄</div>
-                <h3 style={{fontSize: '2.5rem', fontWeight: '900', color: 'white', fontFamily: 'var(--font-heading)'}}>Ready for Review</h3>
+                <h3 style={{fontSize: '2.5rem', fontWeight: '900', color: 'white', fontFamily: 'var(--font-heading)'}}>Ready to Scan</h3>
                 <p style={{maxWidth: '500px', margin: '1.5rem auto', fontSize: '1.1rem', color: 'var(--text-muted)', lineHeight: '1.8'}}>
-                  Upload your resume to receive a personalized report on your job market readiness.
+                  Upload your PDF resume to see your readiness score, strengths, and areas for growth tailored to your target field.
                 </p>
              </div>
           )}
 
           {loading && (
             <div className="placeholder-result card frosted-card" style={{marginTop: 0, minHeight: '520px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-               <span className="spinner large-spinner" style={{borderTopColor: 'var(--accent)'}}></span>
-               <h3 style={{fontSize: '2rem', marginTop: '2rem', fontFamily: 'var(--font-heading)'}}>Reading Your Resume...</h3>
-               <p className="text-muted">Comparing your details with industry standards.</p>
+               <span className="spinner large-spinner"></span>
+               <h3 style={{fontSize: '2rem', marginTop: '2rem', fontFamily: 'var(--font-heading)'}}>Analyzing Resume Intelligence...</h3>
+               <p className="text-muted">Extraction of technical identifiers and career alignment metrics in progress.</p>
             </div>
           )}
 
@@ -178,32 +207,26 @@ export default function ResumeAnalyzer() {
                   </div>
                   <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
                     <h3 style={{fontSize: '0.9rem', color: 'var(--warning)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Improvement Tips 💡</h3>
-                    <ul style={{listStyle: 'none', padding: 0}}>
-                      {result.keywords_to_add.slice(0,4).map((key, i) => (
-                        <li key={i} style={{fontSize: '0.9rem', marginBottom: '1rem', color: '#cbd5e1', lineHeight: '1.5', display: 'flex', gap: '0.8rem'}}>
-                          <span style={{color: 'var(--warning)'}}>+</span> Add "{key}"
-                        </li>
-                      ))}
-                    </ul>
+                    <div style={{padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)'}}>
+                       <p style={{fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.6'}}>{result.strengths[4] || "Focus on quantifiable achievements in your next iteration."}</p>
+                    </div>
                   </div>
                </div>
 
                <div className="card frosted-card" style={{padding: '3rem', background: 'rgba(15, 23, 42, 0.4)'}}>
-                  <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem'}}>
-                     <h3 style={{fontSize: '1.8rem', fontWeight: '900', fontFamily: 'var(--font-heading)'}}>Analysis Summary</h3>
+                  <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem'}}>
+                     <h3 style={{fontSize: '1.8rem', fontWeight: '900'}}>Platform Verified Roadmap</h3>
                      <div style={{height: '1px', flex: 1, background: 'rgba(255,255,255,0.1)'}}></div>
                   </div>
-                  <div className="grid-2-cols" style={{gap: '3rem'}}>
-                     <div style={{lineHeight: '1.8', color: '#94a3b8'}}>
-                        <h4 style={{color: 'white', marginBottom: '1rem'}}>Market Standing</h4>
-                        <p>Your profile aligns <strong>{result.match_label}</strong> with the <strong>{jobField}</strong> field. By adding the suggested keywords and highlighting your specific projects, you can improve your chances significantly.</p>
-                     </div>
-                     <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-                        <div style={{padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)'}}>
-                           <h5 style={{fontSize: '0.8rem', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '0.5rem'}}>Next Step</h5>
-                           <p style={{fontSize: '0.95rem'}}>Focus on adding "<strong>{result.keywords_to_add[0]}</strong>" to your resume to pass automated checks more easily.</p>
-                        </div>
-                     </div>
+                  <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+                     {result.roadmap.map((step, idx) => (
+                       <div key={idx} style={{padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '15px', background: 'rgba(255,255,255,0.02)', display: 'flex', gap: '1.5rem', alignItems: 'center'}}>
+                          <div style={{width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', flexShrink: 0}}>
+                            {idx + 1}
+                          </div>
+                          <div style={{fontSize: '1rem', color: '#e2e8f0'}}>{step}</div>
+                       </div>
+                     ))}
                   </div>
                </div>
             </div>
