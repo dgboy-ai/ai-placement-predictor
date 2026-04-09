@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+
 
 export default function ResumeAnalyzer() {
   const [file, setFile] = useState(null);
@@ -261,6 +263,37 @@ export default function ResumeAnalyzer() {
                     </div>
                   </div>
                </div>
+
+                {/* VISUAL CHART SECTION */}
+                <div className="card frosted-card" style={{padding: '2rem'}}>
+                  <h3 style={{fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'var(--font-heading)'}}>Impact Analytics 📊</h3>
+                  <div style={{width: '100%', height: '280px'}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={[
+                        { metric: 'Overall Match', score: result.field_match_index, fill: '#10b981' },
+                        { metric: 'Action Verbs', score: Math.min((result.impact_telemetry?.action_velocity || 0) * 10, 100), fill: '#38bdf8' },
+                        { metric: 'Metrics Density', score: Math.min((result.impact_telemetry?.metric_density || 0) * 20, 100), fill: '#0ea5e9' },
+                        { metric: 'ATS Readiness', score: result.resume_score, fill: '#8b5cf6' }
+                      ]} margin={{top: 10, right: 10, bottom: 20, left: -20}}>
+                        <XAxis dataKey="metric" tick={{fill: '#94a3b8', fontSize: 12}} />
+                        <YAxis domain={[0, 100]} tick={{fill: '#94a3b8', fontSize: 12}} />
+                        <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px'}} />
+                        <Bar dataKey="score" radius={[6, 6, 0, 0]}>
+                          {
+                            [
+                              { metric: 'Overall Match', score: result.field_match_index, fill: '#10b981' },
+                              { metric: 'Action Verbs', score: Math.min((result.impact_telemetry?.action_velocity || 0) * 10, 100), fill: '#38bdf8' },
+                              { metric: 'Metrics Density', score: Math.min((result.impact_telemetry?.metric_density || 0) * 20, 100), fill: '#0ea5e9' },
+                              { metric: 'ATS Readiness', score: result.resume_score, fill: '#8b5cf6' }
+                            ].map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.fill} />
+                            ))
+                          }
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
 
                <div className="card frosted-card" style={{padding: '3rem', background: 'rgba(15, 23, 42, 0.4)'}}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem'}}>

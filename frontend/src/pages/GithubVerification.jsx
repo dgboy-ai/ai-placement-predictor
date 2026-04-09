@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+
 
 export default function GithubVerification() {
   const [githubLink, setGithubLink] = useState('');
@@ -174,6 +176,32 @@ export default function GithubVerification() {
                        </p>
                     </div>
                   </div>
+               </div>
+
+               {/* VISUAL CHART SECTION */}
+               <div className="card frosted-card" style={{padding: '2rem'}}>
+                 <h3 style={{fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'var(--font-heading)'}}>Activity & Impact Profile 📈</h3>
+                 <div style={{width: '100%', height: '280px'}}>
+                   <ResponsiveContainer width="100%" height="100%">
+                     <AreaChart data={[
+                       { name: 'Velocity', value: Math.min((result.velocity || 0) * 5, 100) },
+                       { name: 'Impact', value: Math.min((result.stats?.stars || 0) * 10 + (result.stats?.originals ? 20 : 0), 100) },
+                       { name: 'Originality', value: Math.min((result.stats?.originals || 0) * 10 + 30, 100) },
+                       { name: 'Suitability', value: result.github_score }
+                     ]} margin={{top: 10, right: 10, bottom: 20, left: -20}}>
+                       <defs>
+                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                           <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.8}/>
+                           <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                         </linearGradient>
+                       </defs>
+                       <XAxis dataKey="name" tick={{fill: '#94a3b8', fontSize: 12}} />
+                       <YAxis domain={[0, 100]} tick={{fill: '#94a3b8', fontSize: 12}} />
+                       <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px'}} />
+                       <Area type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                     </AreaChart>
+                   </ResponsiveContainer>
+                 </div>
                </div>
 
                <div className="card frosted-card" style={{padding: '3rem', background: 'rgba(15, 23, 42, 0.4)'}}>

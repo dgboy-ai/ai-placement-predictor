@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+
 
 export default function PlacementPredictor() {
   const [formData, setFormData] = useState({
@@ -56,6 +58,14 @@ export default function PlacementPredictor() {
       default: return 'risk-medium';
     }
   };
+
+  const chartData = [
+    { subject: 'Academics', score: Math.min((formData.cgpa / 10) * 100, 100), fullMark: 100 },
+    { subject: 'Skills', score: Math.min((formData.skills_score / 10) * 100, 100), fullMark: 100 },
+    { subject: 'Communication', score: Math.min((formData.communication_score / 10) * 100, 100), fullMark: 100 },
+    { subject: 'Projects', score: Math.min((formData.projects / 3) * 100, 100), fullMark: 100 },
+    { subject: 'Internships', score: Math.min((formData.internships / 3) * 100, 100), fullMark: 100 },
+  ];
 
   return (
     <div className="page-container fade-in">
@@ -208,6 +218,20 @@ export default function PlacementPredictor() {
               </div>
 
               <div className="grid-2-cols" style={{alignItems: 'stretch', gap: '2.5rem'}}>
+                <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
+                  <h3 className="section-title" style={{fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px'}}>Profile Strengths 📈</h3>
+                  <div style={{width: '100%', height: '250px'}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                        <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                        <PolarAngleAxis dataKey="subject" tick={{fill: '#94a3b8', fontSize: 11}} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                        <Radar name="Student" dataKey="score" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.4} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
                 <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
                   <h3 className="section-title" style={{fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px'}}>Prediction breakdown 📊</h3>
                   <ul className="bullet-list" style={{listStyle: 'none', padding: 0}}>
