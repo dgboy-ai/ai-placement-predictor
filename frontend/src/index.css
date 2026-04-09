@@ -840,3 +840,94 @@ body::after {
   .grid-2-cols { grid-template-columns: 1fr; }
   .glass-panel-bg { display: none; } /* Hide on mobile to prevent clutter */
 }
+
+/* --- GITHUB VERIFICATION STYLES --- */
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(5px);
+}
+
+.stat-item span {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.stat-item strong {
+  color: white;
+  font-size: 1.2rem;
+  font-family: var(--font-heading);
+}
+
+.tech-stack-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tech-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 40px;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.lang-name {
+  font-weight: 600;
+  color: white;
+  font-size: 0.95rem;
+}
+
+.skill-bar-bg {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lang-count {
+  text-align: right;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.text-success { color: var(--success) !important; }
+.text-accent { color: var(--accent) !important; }
+.text-warning { color: var(--warning) !important; }
+
+.insight-warning {
+  border-left: 4px solid var(--warning) !important;
+  background: rgba(245, 158, 11, 0.05) !important;
+}
+
+.verification-badge-large {
+  display: flex;
+  flex-direction: column;
+}
+
+.border-top { border-top: 1px solid var(--border-color); }
+.mt-5 { margin-top: 3rem; }
+.pt-4 { padding-top: 2rem; }
+.pt-5 { padding-top: 3rem; }

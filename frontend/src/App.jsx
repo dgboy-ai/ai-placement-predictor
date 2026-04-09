@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
+import ResumeAnalyzer from './pages/ResumeAnalyzer';
+import GithubVerification from './pages/GithubVerification';
 import './index.css';
 
 function App() {
@@ -14,6 +16,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/analyzer" element={<ResumeAnalyzer />} />
+            <Route path="/github" element={<GithubVerification />} />
             <Route path="/about" element={<About />} />
           </Routes>
         </main>
@@ -23,3 +27,4 @@ function App() {
 }
 
 export default App;
+
