@@ -52,14 +52,15 @@ def improve_resume_content(raw_text, job_field, detected_skills, weak_points):
     1. Re-write the resume content to be highly professional and ATS-optimized for the target job field: {job_field}.
     2. Incorporate the detected skills: {', '.join(detected_skills)}.
     3. Specifically address and fix these weak points: {', '.join(weak_points)}.
-    4. Use strong action verbs and include quantitative metrics (e.g., %, $, ms, numbers) even if you have to reasonably estimate them based on typical industry achievements.
+    4. Use the Amazon "XYZ" formula for ALL bullet points: "Accomplished [X] as measured by [Y], by doing [Z]" or "Did X using Y resulting in Z". Focus on impact, metrics, and scale.
+    5. Be succinct, highly professional, and do not use generic filler words.
     
     RAW RESUME TEXT:
     {raw_text}
     
     Return the result in a STRICT JSON format with the following keys:
     - name: User's full name
-    - contact: Email, phone, LinkedIn, Location
+    - contact: Email, phone, LinkedIn, Location separated by |
     - summary: A 3-4 sentence professional summary
     - skills: An array of technical and soft skills
     - experience: An array of objects with 'title', 'company', 'date', and 'achievements' (array of strings)
@@ -152,7 +153,11 @@ def generate_resume_pdf(data, output_stream):
 
     # Safe extraction helpers
     def safe_str(val, default=""):
-        return str(val) if val else default
+        if not val: return default
+        s = str(val)
+        # Escape XML characters to prevent ReportLab parsing crashes
+        s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        return s
 
     def safe_list(val):
         if isinstance(val, list): return val
@@ -170,7 +175,7 @@ def generate_resume_pdf(data, output_stream):
     story.append(Paragraph(contact, contact_style))
     
     # Divider substitute (simple text line since HRFlowable can be tricky with imports)
-    story.append(Paragraph("____________________________________________________________________________________", contact_style))
+    story.append(Paragraph("<b><font color='#333333'>_____________________________________________________________________________________________</font></b>", contact_style))
     story.append(Spacer(1, 10))
 
     # Summary
