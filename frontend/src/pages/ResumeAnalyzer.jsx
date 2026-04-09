@@ -20,7 +20,6 @@ export default function ResumeAnalyzer() {
       return;
     }
     
-    // Determine the final job field to send
     const finalField = fieldSelection === 'Other' ? customField : fieldSelection;
     if (!finalField) {
       setError('Please provide a target job field.');
@@ -28,6 +27,7 @@ export default function ResumeAnalyzer() {
     }
 
     setLoading(true);
+    setResult(null); // Clear previous results
     setError('');
     
     const formData = new FormData();
@@ -132,13 +132,6 @@ export default function ResumeAnalyzer() {
             </form>
             {error && <div className="error-message mt-3">{error}</div>}
           </div>
-
-          <div className="card frosted-card mt-4" style={{padding: '1.5rem', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.05)'}}>
-             <h4 style={{fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '1.2rem', letterSpacing: '1.5px', fontWeight: '900'}}>Pro Tip</h4>
-             <p style={{fontSize: '0.85rem', color: '#64748b', lineHeight: '1.6'}}>
-                Make sure your resume includes clear project descriptions and measurable impact to get the best match results.
-             </p>
-          </div>
         </aside>
 
         <main className="dashboard-results" style={{flex: 1, minWidth: 0}}>
@@ -171,14 +164,14 @@ export default function ResumeAnalyzer() {
                     background: 'rgba(56, 189, 248, 0.05)',
                     boxShadow: '0 0 30px rgba(56, 189, 248, 0.1)'
                  }}>
-                    <div style={{fontSize: '3.5rem', fontWeight: '900', color: 'var(--primary)'}}>{result.score}<span style={{fontSize: '1rem', verticalAlign: 'middle'}}>%</span></div>
+                    <div style={{fontSize: '3.5rem', fontWeight: '900', color: 'var(--primary)'}}>{result.resume_score}<span style={{fontSize: '1rem', verticalAlign: 'middle'}}>%</span></div>
                  </div>
                  <div style={{flex: 1}}>
                     <span style={{fontSize: '0.85rem', color: 'var(--primary)', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px'}}>Readiness Score</span>
-                    <h3 style={{fontSize: '3rem', marginTop: '0.5rem', fontFamily: 'var(--font-heading)'}}>{result.match_label}</h3>
+                    <h3 style={{fontSize: '3rem', marginTop: '0.5rem', fontFamily: 'var(--font-heading)'}}>{result.ats_status}</h3>
                     <div className="badges mt-3" style={{display: 'flex', gap: '1rem'}}>
                       <span className="badge" style={{background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.2)'}}>
-                        Best Field: {result.recommended_field}
+                        Target: {result.job_field}
                       </span>
                     </div>
                  </div>
@@ -186,29 +179,31 @@ export default function ResumeAnalyzer() {
 
                <div className="features-grid" style={{gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem'}}>
                   <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
-                    <h3 style={{fontSize: '0.9rem', color: 'var(--success)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Your Strengths ✨</h3>
+                    <h3 style={{fontSize: '0.9rem', color: 'var(--success)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Detected Skills ✨</h3>
                     <ul style={{listStyle: 'none', padding: 0}}>
-                      {result.strengths.slice(0,4).map((str, i) => (
+                      {result.detected_skills && result.detected_skills.length > 0 ? result.detected_skills.slice(0,5).map((str, i) => (
                         <li key={i} style={{fontSize: '0.9rem', marginBottom: '1rem', color: '#cbd5e1', lineHeight: '1.5', display: 'flex', gap: '0.8rem'}}>
                           <span style={{color: 'var(--success)'}}>✓</span> {str}
                         </li>
-                      ))}
+                      )) : <li style={{color: '#64748b'}}>No specific skills detected.</li>}
                     </ul>
                   </div>
                   <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
-                    <h3 style={{fontSize: '0.9rem', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Areas to Grow 🌱</h3>
+                    <h3 style={{fontSize: '0.9rem', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Improvements 🌱</h3>
                     <ul style={{listStyle: 'none', padding: 0}}>
-                      {result.improvements.slice(0,4).map((imp, i) => (
+                      {result.improvements && result.improvements.length > 0 ? result.improvements.slice(0,5).map((imp, i) => (
                         <li key={i} style={{fontSize: '0.9rem', marginBottom: '1rem', color: '#cbd5e1', lineHeight: '1.5', display: 'flex', gap: '0.8rem'}}>
                           <span style={{color: 'var(--accent)'}}>✦</span> {imp}
                         </li>
-                      ))}
+                      )) : <li style={{color: '#64748b'}}>No critical improvements identified.</li>}
                     </ul>
                   </div>
                   <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
-                    <h3 style={{fontSize: '0.9rem', color: 'var(--warning)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Improvement Tips 💡</h3>
+                    <h3 style={{fontSize: '0.9rem', color: 'var(--warning)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Structural Check 💡</h3>
                     <div style={{padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)'}}>
-                       <p style={{fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.6'}}>{result.strengths[4] || "Focus on quantifiable achievements in your next iteration."}</p>
+                       <p style={{fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.6'}}>
+                         {result.weak_points && result.weak_points[0] ? result.weak_points[0] : "Resume structure is well-optimized for parsing."}
+                       </p>
                     </div>
                   </div>
                </div>
@@ -219,14 +214,14 @@ export default function ResumeAnalyzer() {
                      <div style={{height: '1px', flex: 1, background: 'rgba(255,255,255,0.1)'}}></div>
                   </div>
                   <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-                     {result.roadmap.map((step, idx) => (
+                     {result.suggestions && result.suggestions.length > 0 ? result.suggestions.map((step, idx) => (
                        <div key={idx} style={{padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '15px', background: 'rgba(255,255,255,0.02)', display: 'flex', gap: '1.5rem', alignItems: 'center'}}>
                           <div style={{width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', flexShrink: 0}}>
                             {idx + 1}
                           </div>
                           <div style={{fontSize: '1rem', color: '#e2e8f0'}}>{step}</div>
                        </div>
-                     ))}
+                     )) : <p style={{color: '#64748b'}}>No specific roadmap steps available. Refine your resume to get deeper insights.</p>}
                   </div>
                </div>
             </div>
