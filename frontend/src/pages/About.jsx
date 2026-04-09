@@ -1,49 +1,102 @@
+import React from 'react';
+
 export default function About() {
   return (
     <div className="page-container fade-in">
-      <section className="about-section pt-5">
-        <span className="header-badge">The Mission</span>
-        <h1 className="hero-title" style={{fontSize: '4rem', textAlign: 'left', marginBottom: '2rem'}}>Next-Gen Career <span className="text-gradient">Intelligence</span></h1>
-        <p className="about-desc">
-          Solox is an advanced AI-driven Career intelligence engine designed to bridge the gap between academic education and industry expectations. 
-          By combining historical placement data with real-time profile verification, we provide students with the most accurate career predictions in the ecosystem.
-        </p>
-
-        <h2 className="section-title mb-5">Core Capabilities</h2>
-        <div className="features-grid">
-          <div className="card feature-card">
-            <div className="feature-icon">🚀</div>
-            <h3>Probability Defense</h3>
-            <p>Our ensemble models analyze 12+ critical factors to determine your placement risk and probability with deterministic accuracy.</p>
-          </div>
-          
-          <div className="card feature-card">
-            <div className="feature-icon">📄</div>
-            <h3>Vector Analysis</h3>
-            <p>High-precision NLP parsing of resumes to identify technical identifiers, soft skills, and experience weights.</p>
-          </div>
-          
-          <div className="card feature-card" style={{gridColumn: 'span 1'}}>
-            <div className="feature-icon">🛡️</div>
-            <h3>Auth Screening</h3>
-            <p>Automated GitHub verification layer ensures your technical contributions are valid, consistent, and original.</p>
-          </div>
-
-          <div className="card feature-card">
-            <div className="feature-icon">🛠️</div>
-            <h3>Roadmap Engine</h3>
-            <p>Dynamically generated 6-month growth plans that adapt to your specific skill deficiencies and career goals.</p>
-          </div>
+       <div className="hero-section" style={{padding: '5rem 0', minHeight: 'auto'}}>
+        <div className="hero-content">
+          <span className="header-badge">Nextora Intelligence Hub 🏛️</span>
+          <h1 className="hero-title" style={{fontSize: '4.5rem', fontFamily: 'var(--font-heading)'}}>About <span className="text-gradient">Nextora AI</span></h1>
+          <p className="hero-subtitle" style={{fontSize: '1.2rem', maxWidth: '750px', margin: '0 auto'}}>
+             A comprehensive breakdown of how we empower students to navigate the complex landscape of professional placements.
+          </p>
         </div>
+      </div>
 
-        <div className="card mt-5" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(14, 165, 233, 0.1))', border: '1px solid var(--border-color)', textAlign: 'center'}}>
-           <h3 style={{fontSize: '2rem', marginBottom: '1.5rem'}}>Built for the Future</h3>
-           <p className="text-muted" style={{maxWidth: '700px', margin: '0 auto'}}>
-              Solox is built using state-of-the-art technologies including FastAPI, React, and Scikit-Learn. 
-              Our goal is to democratize career intelligence and empower every student with data-driven decision making capabilities.
-           </p>
-        </div>
-      </section>
+      <div className="results-wrapper" style={{display: 'flex', flexDirection: 'column', gap: '4rem'}}>
+        
+        {/* Section 1: Why this project exists */}
+        <section className="card frosted-card" style={{padding: '4rem'}}>
+          <div className="grid-2-cols" style={{alignItems: 'center', gap: '4rem'}}>
+             <div>
+                <h2 style={{fontSize: '2.5rem', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)'}}>Why we <span className="text-gradient">Exist</span></h2>
+                <p style={{fontSize: '1.1rem', color: '#94a3b8', lineHeight: '1.8'}}>
+                  Navigating the placement season is one of the most stressful phases of a student's life. Conventional advice is often generic, biased, or outdated. 
+                  Nextora AI was created to provide a <strong>data-driven, objective, and supportive</strong> partner for every student, regardless of their background. 
+                  We believe that with the right data and a clear plan, every student can reach their full potential.
+                </p>
+             </div>
+             <div style={{fontSize: '8rem', textAlign: 'center'}}>🌟</div>
+          </div>
+        </section>
+
+        {/* Section 2: How it helps */}
+        <section className="card frosted-card" style={{padding: '4rem'}}>
+          <div className="grid-2-cols" style={{alignItems: 'center', gap: '4rem'}}>
+             <div style={{fontSize: '8rem', textAlign: 'center'}}>🛡️</div>
+             <div>
+                <h2 style={{fontSize: '2.5rem', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)'}}>How it <span className="text-gradient">Helps</span></h2>
+                <p style={{fontSize: '1.1rem', color: '#94a3b8', lineHeight: '1.8'}}>
+                  We bridge the gap between "where you are" and "where you want to be." By analyzing your current academic standing and technical work, we:
+                </p>
+                <ul style={{marginTop: '1.5rem', fontSize: '1rem', color: '#cbd5e1', lineHeight: '2'}}>
+                   <li>Provide a realistic probability of your recruitment outcomes.</li>
+                   <li>Identify specific skill gaps that recruiters care about.</li>
+                   <li>Verify your technical projects so your profile has authentic proof.</li>
+                   <li>Build a manageable 6-month preparation plan.</li>
+                </ul>
+             </div>
+          </div>
+        </section>
+
+        {/* Section 3: What it uses */}
+        <section className="card frosted-card" style={{padding: '4rem'}}>
+           <h2 style={{fontSize: '2.5rem', marginBottom: '3rem', fontFamily: 'var(--font-heading)', textAlign: 'center'}}>Our <span className="text-gradient">Technical Arsenal</span></h2>
+           <div className="features-grid" style={{gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem'}}>
+              <div className="card" style={{background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)'}}>
+                 <h4 style={{color: 'var(--primary)', marginBottom: '1rem'}}>AI & ML</h4>
+                 <p style={{fontSize: '0.85rem', color: '#64748b'}}>Multi-Layer Perceptron (MLP) Neural Networks and Scikit-learn for non-linear outcome prediction.</p>
+              </div>
+              <div className="card" style={{background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)'}}>
+                 <h4 style={{color: 'var(--accent)', marginBottom: '1rem'}}>Intelligence APIs</h4>
+                 <p style={{fontSize: '0.85rem', color: '#64748b'}}>Custom NLP parsers for Resume screening and GitHub Graph API for project verification.</p>
+              </div>
+              <div className="card" style={{background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)'}}>
+                 <h4 style={{color: 'var(--success)', marginBottom: '1rem'}}>Modern Web Stack</h4>
+                 <p style={{fontSize: '0.85rem', color: '#64748b'}}>React 18 for high-fidelity UI, FastAPI for performance-critical backend, and PostgreSQL for secure data storage.</p>
+              </div>
+           </div>
+        </section>
+
+        {/* Section 4: How it works */}
+        <section className="card frosted-card" style={{padding: '4rem', textAlign: 'center', background: 'rgba(0,0,0,0.2)'}}>
+           <h2 style={{fontSize: '2.5rem', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)'}}>The <span className="text-gradient">Process</span></h2>
+           <p style={{maxWidth: '700px', margin: '0 auto 4rem', color: '#94a3b8'}}>Four simple steps to professional clarity.</p>
+           
+           <div className="grid-4-cols" style={{gap: '2rem'}}>
+              <div>
+                 <div style={{fontSize: '2rem', marginBottom: '1rem'}}>1️⃣</div>
+                 <h4>Data Intake</h4>
+                 <p style={{fontSize: '0.8rem', color: '#64748b'}}>You provide your academic and technical details.</p>
+              </div>
+              <div>
+                 <div style={{fontSize: '2rem', marginBottom: '1rem'}}>2️⃣</div>
+                 <h4>Neural Analysis</h4>
+                 <p style={{fontSize: '0.8rem', color: '#64748b'}}>Our ML model compares your data against 7,500+ successful paths.</p>
+              </div>
+              <div>
+                 <div style={{fontSize: '2rem', marginBottom: '1rem'}}>3️⃣</div>
+                 <h4>Smart Verification</h4>
+                 <p style={{fontSize: '0.8rem', color: '#64748b'}}>We analyze your Resume and GitHub for industry alignment.</p>
+              </div>
+              <div>
+                 <div style={{fontSize: '2rem', marginBottom: '1rem'}}>4️⃣</div>
+                 <h4>Actionable Path</h4>
+                 <p style={{fontSize: '0.8rem', color: '#64748b'}}>You receive a score, an explanation, and a 6-month roadmap.</p>
+              </div>
+           </div>
+        </section>
+      </div>
     </div>
   );
 }

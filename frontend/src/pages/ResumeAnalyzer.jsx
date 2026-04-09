@@ -1,64 +1,29 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 export default function ResumeAnalyzer() {
-  const [jobField, setJobField] = useState('Full Stack Development');
-  const [customField, setCustomField] = useState('');
-  const [showCustom, setShowCustom] = useState(false);
   const [file, setFile] = useState(null);
+  const [jobField, setJobField] = useState('General Software Engineering');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const jobFields = [
-    "Full Stack Development",
-    "Data Science & AI",
-    "DevOps & Cloud",
-    "Backend Engineering",
-    "Frontend Engineering",
-    "Software Testing",
-    "Mobile App Development",
-    "Cybersecurity"
-  ];
-
-  const handleFieldChange = (e) => {
-    const val = e.target.value;
-    if (val === 'Other') {
-      setShowCustom(true);
-      setJobField('');
-    } else {
-      setShowCustom(false);
-      setJobField(val);
-    }
-  };
-
   const handleFileChange = (e) => {
-    if (e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setError('');
-    }
+    setFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const finalField = showCustom ? customField : jobField;
-    
-    if (!finalField) {
-      setError('Please select or type a job field.');
-      return;
-    }
     if (!file) {
-      setError('Please select a PDF file first.');
+      setError('Please select a PDF resume first.');
       return;
     }
-    
     setLoading(true);
     setError('');
-    setResult(null);
     
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('job_field', finalField);
+    formData.append('job_field', jobField);
     
     try {
       const response = await axios.post('http://127.0.0.1:8000/analyze-resume', formData, {
@@ -67,7 +32,7 @@ export default function ResumeAnalyzer() {
       setResult(response.data);
     } catch (err) {
       console.error(err);
-      setError('Backend error. Please make sure the server is running.');
+      setError('Connection Error: Failed to analyze your resume.');
     } finally {
       setLoading(false);
     }
@@ -75,182 +40,176 @@ export default function ResumeAnalyzer() {
 
   return (
     <div className="page-container fade-in">
-       <div className="hero-section" style={{padding: '3rem 0', minHeight: 'auto'}}>
+      <div className="hero-section" style={{padding: '3rem 0', minHeight: 'auto'}}>
         <div className="hero-content">
-          <span className="header-badge">Resume Analysis</span>
-          <h1 className="hero-title" style={{fontSize: '3.5rem'}}>Check Your <span className="text-gradient">Resume</span></h1>
-          <p className="hero-subtitle" style={{fontSize: '1.2rem', marginBottom: '2rem'}}>
-            Upload your resume and tell us what job you want. We'll tell you if you're ready and how to improve.
+          <span className="header-badge">Nextora Intelligence 📄</span>
+          <h1 className="hero-title" style={{fontSize: '4rem', fontFamily: 'var(--font-heading)'}}>Resume <span className="text-gradient">Analysis</span></h1>
+          <p className="hero-subtitle" style={{fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto'}}>
+             Upload your resume and tell us your target field. We’ll help you see how well you match and how to stand out.
           </p>
         </div>
       </div>
 
-      <div className="dashboard-grid mb-5">
-        <section className="dashboard-form">
-          <div className="card shadow-glass">
-            <h2 style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem'}}>
-               <span style={{fontSize: '2rem'}}>🎯</span> Job Details
+      <div className="dashboard-grid" style={{alignItems: 'flex-start', gap: '3rem'}}>
+        <aside className="dashboard-sidebar" style={{position: 'sticky', top: '2rem', width: '380px', flexShrink: 0}}>
+          <div className="card shadow-glass frosted-card">
+            <h2 style={{fontSize: '1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.8rem', fontFamily: 'var(--font-heading)'}}>
+               Analysis Guide 💡
             </h2>
-            
             <form onSubmit={handleSubmit} className="input-form">
               <div className="form-group mb-4">
-                  <label>What job are you aiming for?</label>
-                  <select 
-                    onChange={handleFieldChange}
-                    className="styled-select"
-                    style={{marginBottom: showCustom ? '1rem' : '0'}}
-                  >
-                    {jobFields.map(field => (
-                      <option key={field} value={field}>{field}</option>
-                    ))}
-                    <option value="Other">Other / Custom</option>
-                  </select>
-                  
-                  {showCustom && (
-                    <input 
-                      type="text" 
-                      placeholder="Type your job title here..." 
-                      className="styled-input fade-in"
-                      value={customField}
-                      onChange={(e) => setCustomField(e.target.value)}
-                      style={{marginTop: '0.5rem'}}
-                    />
-                  )}
-                </div>
+                <label style={{fontSize: '0.8rem', opacity: 0.7, textTransform: 'uppercase'}}>Target Job Field</label>
+                <input 
+                  type="text" 
+                  value={jobField} 
+                  onChange={(e) => setJobField(e.target.value)}
+                  placeholder="e.g. Frontend Developer"
+                  className="styled-input"
+                />
+              </div>
 
-                <div className="form-group mb-5">
-                  <label style={{marginBottom: '1rem', display: 'block'}}>Upload Resume (PDF)</label>
-                  <label className="file-upload-label" style={{ display: 'block', cursor: 'pointer' }}>
-                    <input type="file" accept=".pdf" onChange={handleFileChange} style={{ display: 'none' }} />
-                    <div className={`file-upload-box ${file ? 'has-file' : ''}`} style={{ 
-                      padding: '2rem', 
-                      border: '2px dashed var(--border-color)', 
-                      borderRadius: '16px', 
-                      textAlign: 'center', 
-                      background: 'rgba(255,255,255,0.02)', 
-                      transition: 'all 0.3s' 
-                    }}>
-                      <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{file ? '✅' : '📄'}</div>
-                      {file ? (
-                        <div>
-                          <p style={{ fontWeight: '700', color: 'var(--success)' }}>{file.name}</p>
-                          <span style={{fontSize: '0.8rem', opacity: 0.6}}>Ready to scan</span>
-                        </div>
-                      ) : (
-                        <p style={{ color: 'var(--text-muted)' }}>Click to upload PDF</p>
-                      )}
-                    </div>
-                  </label>
+              <div className="form-group mb-5">
+                <label style={{fontSize: '0.8rem', opacity: 0.7, textTransform: 'uppercase'}}>PDF Resume</label>
+                <div 
+                  className="file-drop-zone"
+                  onClick={() => document.getElementById('resume-upload').click()}
+                  style={{
+                    border: '2px dashed rgba(255,255,255,0.1)',
+                    borderRadius: '15px',
+                    padding: '2rem',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    background: file ? 'rgba(var(--accent-rgb), 0.05)' : 'transparent',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <input 
+                    id="resume-upload"
+                    type="file" 
+                    onChange={handleFileChange} 
+                    accept=".pdf"
+                    style={{display: 'none'}}
+                  />
+                  <div style={{fontSize: '2rem', marginBottom: '1rem'}}>{file ? '✅' : '📁'}</div>
+                  <p style={{fontSize: '0.85rem', color: file ? 'white' : '#64748b'}}>
+                    {file ? file.name : 'Click to select PDF'}
+                  </p>
                 </div>
-              
-                <button type="submit" className="submit-btn" disabled={loading || !file} style={{padding: '1.2rem', width: '100%'}}>
-                  {loading ? <><span className="spinner"></span> Working...</> : 'Scan My Resume'}
-                </button>
+              </div>
+
+              <button type="submit" className="submit-btn" disabled={loading} style={{padding: '1.2rem', fontSize: '1.1rem', background: 'var(--primary)', fontWeight: '700'}}>
+                 {loading ? <><span className="spinner"></span> Checking...</> : 'Check My Resume 🚀'}
+              </button>
             </form>
-            {error && <div className="error-message mt-4">{error}</div>}
+            {error && <div className="error-message mt-3">{error}</div>}
           </div>
-        </section>
 
-        <section className="industry-context" style={{display: 'flex', flexDirection: 'column', gap: '1.2rem'}}>
-          <div className="card pop-in" style={{borderLeft: '4px solid var(--accent)', background: 'rgba(129, 140, 248, 0.05)'}}>
-            <h3 style={{fontSize: '1rem', marginBottom: '0.5rem', color: 'var(--accent)'}}>📄 Why scan your resume?</h3>
-            <p style={{fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6'}}>
-              Most big companies use systems to filter resumes before a human sees them. We show you exactly how to pass those filters.
-            </p>
+          <div className="card frosted-card mt-4" style={{padding: '1.5rem', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.05)'}}>
+             <h4 style={{fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '1.2rem', letterSpacing: '1.5px', fontWeight: '900'}}>Platform Tip</h4>
+             <p style={{fontSize: '0.85rem', color: '#64748b', lineHeight: '1.6'}}>
+                Results are based on industry standards and data from 7,500+ successful career resumes.
+             </p>
           </div>
-          <div className="card pop-in" style={{borderLeft: '4px solid var(--accent-secondary)', animationDelay: '0.1s', background: 'rgba(168, 85, 247, 0.05)'}}>
-            <h3 style={{fontSize: '1rem', marginBottom: '0.5rem', color: 'var(--accent-secondary)'}}>🔑 Keywords Matter</h3>
-            <p style={{fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6'}}>
-              A <b>{showCustom ? customField || 'Custom Job' : jobField}</b> resume needs specific skills. We check if you have the right words for this role.
-            </p>
-          </div>
-          <div className="card pop-in" style={{borderLeft: '4px solid var(--success)', animationDelay: '0.2s', background: 'rgba(16, 185, 129, 0.05)'}}>
-            <h3 style={{fontSize: '1rem', marginBottom: '0.5rem', color: 'var(--success)'}}>💡 Get Tips</h3>
-            <p style={{fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6'}}>
-              Don't just upload and wait. Read our "Winning Refinements" after the scan to see what projects or skills you should add.
-            </p>
-          </div>
-        </section>
-      </div>
+        </aside>
 
-      <div className="results-container">
-        {!result && !loading && (
-             <div className="placeholder-result card fade-in" style={{height: '300px', borderStyle: 'solid'}}>
-                <div className="placeholder-icon" style={{fontSize: '3rem', marginBottom: '1rem'}}>📄</div>
-                <h3>Result will appear here</h3>
-                <p>Submit your resume to get your score and detailed tips.</p>
+        <main className="dashboard-results" style={{flex: 1, minWidth: 0}}>
+          {!result && !loading && (
+             <div className="placeholder-result card frosted-card" style={{marginTop: 0, minHeight: '520px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+                <div style={{fontSize: '5rem', marginBottom: '2rem'}}>📄</div>
+                <h3 style={{fontSize: '2.5rem', fontWeight: '900', color: 'white', fontFamily: 'var(--font-heading)'}}>Ready for Review</h3>
+                <p style={{maxWidth: '500px', margin: '1.5rem auto', fontSize: '1.1rem', color: 'var(--text-muted)', lineHeight: '1.8'}}>
+                  Upload your resume to receive a personalized report on your job market readiness.
+                </p>
              </div>
           )}
-          
+
           {loading && (
-             <div className="placeholder-result loading-result card fade-in" style={{height: '300px'}}>
-               <span className="spinner large-spinner" style={{borderTopColor: 'var(--accent-secondary)'}}></span>
-               <h3>Reading Resume...</h3>
-               <p>Comparing your skills against {showCustom ? customField : jobField} requirements.</p>
-             </div>
-          )}
-          
-          {result && (
-            <div className="results-section">
-              <div className="card overview-card mb-4 pop-in" style={{ display: 'flex', alignItems: 'center', gap: '4rem' }}>
-                <div className="probability-wrapper">
-                  <div className={`probability-circle ${result.resume_score >= 80 ? 'risk-low' : result.resume_score >= 50 ? 'risk-medium' : 'risk-high'}`}></div>
-                  <div className="probability-value" style={{fontSize: '4rem'}}>{result.resume_score}<span>pt</span></div>
-                </div>
-                <div className="overview-details">
-                  <h3 className="prediction-status" style={{fontSize: '1.8rem'}}>{result.job_field} Specialist</h3>
-                  <div className="badges mt-2">
-                     <span className={`badge ${result.ats_status === 'Optimized' ? 'risk-low' : 'risk-high'}`}>ATS {result.ats_status}</span>
-                     <span className="badge confidence" style={{fontSize: '0.8rem'}}>Job Match: {result.field_match_index}%</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid-2-cols mb-4">
-                 <div className="card pop-in" style={{padding: '1.5rem', textAlign: 'center'}}>
-                    <p className="text-muted" style={{fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px'}}>Job Match Score</p>
-                    <div style={{fontSize: '2rem', fontWeight: '900', color: 'var(--accent)', margin: '0.5rem 0'}}>{result.field_match_index}%</div>
-                 </div>
-                 <div className="card pop-in" style={{padding: '1.5rem', textAlign: 'center'}}>
-                    <p className="text-muted" style={{fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px'}}>Company Alignment</p>
-                    <div style={{fontSize: '2rem', fontWeight: '900', color: 'var(--accent-secondary)', margin: '0.5rem 0'}}>{result.product_match}%</div>
-                 </div>
-              </div>
-
-              <div className="details-stack">
-                <div className="card pop-in mb-4">
-                  <h3 className="section-title" style={{fontSize: '1rem'}}>Keywords Found</h3>
-                  <div className="badges" style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-                    {result.detected_skills.length > 0 ? result.detected_skills.map((skill, idx) => (
-                      <span key={idx} className="badge" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'white', border: '1px solid var(--primary)' }}>{skill}</span>
-                    )) : <span className="text-muted">No specific skills detected.</span>}
-                  </div>
-                </div>
-                
-                <div className="grid-2-cols">
-                  <div className="card pop-in mb-4" style={{borderLeft: '5px solid var(--danger)'}}>
-                    <h3 style={{color: 'var(--danger)', fontSize: '1.1rem', marginBottom: '1rem'}}>What's Missing?</h3>
-                    <ul className="bullet-list">
-                      {result.weak_points.map((pt, idx) => (
-                        <li key={idx} style={{fontSize: '0.85rem', marginBottom: '0.5rem'}}>{pt}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <div className="card pop-in mb-4" style={{borderLeft: '5px solid var(--accent-secondary)'}}>
-                    <h3 style={{color: 'var(--accent-secondary)', fontSize: '1.1rem', marginBottom: '1rem'}}>How to Improve</h3>
-                    <ul className="bullet-list">
-                      {result.improvements.map((im, idx) => (
-                        <li key={idx} style={{fontSize: '0.85rem', marginBottom: '0.5rem'}}>{im}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
+            <div className="placeholder-result card frosted-card" style={{marginTop: 0, minHeight: '520px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+               <span className="spinner large-spinner" style={{borderTopColor: 'var(--accent)'}}></span>
+               <h3 style={{fontSize: '2rem', marginTop: '2rem', fontFamily: 'var(--font-heading)'}}>Reading Your Resume...</h3>
+               <p className="text-muted">Comparing your details with industry standards.</p>
             </div>
           )}
+
+          {result && (
+            <div className="results-wrapper fade-in" style={{display: 'flex', flexDirection: 'column', gap: '2.5rem'}}>
+               <div className="card overview-card mt-0 frosted-card" style={{borderLeft: '10px solid var(--primary)', padding: '3rem', display: 'flex', alignItems: 'center', gap: '3rem'}}>
+                 <div style={{
+                    width: '140px', height: '140px', borderRadius: '50%', 
+                    border: '8px solid rgba(255,255,255,0.05)', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                    background: 'rgba(56, 189, 248, 0.05)',
+                    boxShadow: '0 0 30px rgba(56, 189, 248, 0.1)'
+                 }}>
+                    <div style={{fontSize: '3.5rem', fontWeight: '900', color: 'var(--primary)'}}>{result.score}<span style={{fontSize: '1rem', verticalAlign: 'middle'}}>%</span></div>
+                 </div>
+                 <div style={{flex: 1}}>
+                    <span style={{fontSize: '0.85rem', color: 'var(--primary)', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px'}}>Readiness Score</span>
+                    <h3 style={{fontSize: '3rem', marginTop: '0.5rem', fontFamily: 'var(--font-heading)'}}>{result.match_label}</h3>
+                    <div className="badges mt-3" style={{display: 'flex', gap: '1rem'}}>
+                      <span className="badge" style={{background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.2)'}}>
+                        Best Field: {result.recommended_field}
+                      </span>
+                    </div>
+                 </div>
+               </div>
+
+               <div className="features-grid" style={{gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem'}}>
+                  <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
+                    <h3 style={{fontSize: '0.9rem', color: 'var(--success)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Your Strengths ✨</h3>
+                    <ul style={{listStyle: 'none', padding: 0}}>
+                      {result.strengths.slice(0,4).map((str, i) => (
+                        <li key={i} style={{fontSize: '0.9rem', marginBottom: '1rem', color: '#cbd5e1', lineHeight: '1.5', display: 'flex', gap: '0.8rem'}}>
+                          <span style={{color: 'var(--success)'}}>✓</span> {str}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
+                    <h3 style={{fontSize: '0.9rem', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Areas to Grow 🌱</h3>
+                    <ul style={{listStyle: 'none', padding: 0}}>
+                      {result.improvements.slice(0,4).map((imp, i) => (
+                        <li key={i} style={{fontSize: '0.9rem', marginBottom: '1rem', color: '#cbd5e1', lineHeight: '1.5', display: 'flex', gap: '0.8rem'}}>
+                          <span style={{color: 'var(--accent)'}}>✦</span> {imp}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="card frosted-card" style={{margin: 0, padding: '2rem'}}>
+                    <h3 style={{fontSize: '0.9rem', color: 'var(--warning)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '1px'}}>Improvement Tips 💡</h3>
+                    <ul style={{listStyle: 'none', padding: 0}}>
+                      {result.keywords_to_add.slice(0,4).map((key, i) => (
+                        <li key={i} style={{fontSize: '0.9rem', marginBottom: '1rem', color: '#cbd5e1', lineHeight: '1.5', display: 'flex', gap: '0.8rem'}}>
+                          <span style={{color: 'var(--warning)'}}>+</span> Add "{key}"
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+               </div>
+
+               <div className="card frosted-card" style={{padding: '3rem', background: 'rgba(15, 23, 42, 0.4)'}}>
+                  <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem'}}>
+                     <h3 style={{fontSize: '1.8rem', fontWeight: '900', fontFamily: 'var(--font-heading)'}}>Analysis Summary</h3>
+                     <div style={{height: '1px', flex: 1, background: 'rgba(255,255,255,0.1)'}}></div>
+                  </div>
+                  <div className="grid-2-cols" style={{gap: '3rem'}}>
+                     <div style={{lineHeight: '1.8', color: '#94a3b8'}}>
+                        <h4 style={{color: 'white', marginBottom: '1rem'}}>Market Standing</h4>
+                        <p>Your profile aligns <strong>{result.match_label}</strong> with the <strong>{jobField}</strong> field. By adding the suggested keywords and highlighting your specific projects, you can improve your chances significantly.</p>
+                     </div>
+                     <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+                        <div style={{padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)'}}>
+                           <h5 style={{fontSize: '0.8rem', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '0.5rem'}}>Next Step</h5>
+                           <p style={{fontSize: '0.95rem'}}>Focus on adding "<strong>{result.keywords_to_add[0]}</strong>" to your resume to pass automated checks more easily.</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );
 }
-
